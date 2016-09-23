@@ -25,7 +25,10 @@ pifp = float(pi);
 ##
 def X(input_point): return input_point[0] if input_point != None else None; 
 def Y(input_point): return input_point[1] if input_point != None else None; 
+
 def V(x, y): return vector([x, y])
+def midpoint(A, B): return (A + B) / 2.0
+def midpoint2(t, A, B): return (1 - float(t)) * A + float(t) * B
 
 def get_solutionsXY(solns):
      if solns == None: 

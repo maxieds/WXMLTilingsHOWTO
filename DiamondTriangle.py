@@ -152,42 +152,43 @@ class DTriangleTile(object):
                centpt1, centpt2 = 2.0 / 3.0 * A + 1.0 / 3.0 * C, \
                                   2.0 / 3.0 * C + 1.0 / 3.0 * A
                
+               return [DTriangleTile(BTILE, A, B, C, D)]
                #### !!!! Fill these coordinates in for the HOWTO !!!! ####
-               return [ 
-                    DTriangleTile(OTILE, 
-                                  pa = D, 
-                                  pb = t11, 
-                                  pc = t12), 
-                    DTriangleTile(OTILE, 
-                                  pa = B, 
-                                  pb = t21, 
-                                  pc = t22), 
-                    DTriangleTile(BTILE, 
-                                  pa = , 
-                                  pb = , 
-                                  pc = , 
-                                  pd = ), 
-                    DTriangleTile(BTILE, 
-                                  pa = , 
-                                  pb = , 
-                                  pc = , 
-                                  pd = ), 
-                    DTriangleTile(BTILE, 
-                                  pa = , 
-                                  pb = , 
-                                  pc = , 
-                                  pd = ), 
-                    DTriangleTile(BTILE, 
-                                  pa = , 
-                                  pb = , 
-                                  pc = , 
-                                  pd = ), 
-                    DTriangleTile(BTILE, 
-                                  pa = , 
-                                  pb = , 
-                                  pc = , 
-                                  pd = ), 
-               ]; 
+               #return [ 
+                    #DTriangleTile(OTILE, 
+                    #              pa = D, 
+                    #              pb = t11, 
+                    #              pc = t12), 
+                    #DTriangleTile(OTILE, 
+                    #              pa = B, 
+                    #              pb = t21, 
+                    #              pc = t22), 
+                    #DTriangleTile(BTILE, 
+                    #              pa = , 
+                    #              pb = , 
+                    #              pc = , 
+                    #              pd = ), 
+                    #DTriangleTile(BTILE, 
+                    #              pa = , 
+                    #              pb = , 
+                    #              pc = , 
+                    #              pd = ), 
+                    #DTriangleTile(BTILE, 
+                    #              pa = , 
+                    #              pb = , 
+                    #              pc = , 
+                    #              pd = ), 
+                    #DTriangleTile(BTILE, 
+                    #              pa = , 
+                    #              pb = , 
+                    #              pc = , 
+                    #              pd = ), 
+                    #DTriangleTile(BTILE, 
+                    #              pa = , 
+                    #              pb = , 
+                    #              pc = , 
+                    #              pd = ), 
+               #]; 
           ##           
      ## def 
 
@@ -223,7 +224,7 @@ class DiamondTriangle_Tiling(Tiling):
       # Returns a description of the tiling
      ##
      def desc(self): 
-          return "the equithirds triangular tiling"; 
+          return "the diamond triangle tiling"; 
      
      ## get_initial_tile
       # Returns the only tile in the tiling after zero steps

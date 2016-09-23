@@ -50,9 +50,7 @@ class DTriangleTile(object):
       # substitution step
      ##
      def to_subtiles(self): 
-          A, B, C, D = self.pa, self.pb, self.pc, self.pd  
-          Ax, Bx, Cx, Dx, Ay, By, Cy, Dy = X(A), X(B), X(C), X(D), \
-                                           Y(A), Y(B), Y(C), Y(D)   
+          A, B, C, D = self.pa, self.pb, self.pc, self.pd    
           if self.tile_type == OTILE: 
                t1AB, t1AC = 2.0 / 3.0 * A + 1.0 / 3.0 * B,\
                             2.0 / 3.0 * A + 1.0 / 3.0 * C
@@ -225,7 +223,7 @@ class DiamondTriangle_Tiling(Tiling):
       # Returns a description of the tiling
      ##
      def desc(self): 
-          return "the equithirds triangular tiling"; 
+          return "the diamond triangle tiling"; 
      
      ## get_initial_tile
       # Returns the only tile in the tiling after zero steps
