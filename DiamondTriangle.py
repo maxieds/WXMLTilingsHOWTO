@@ -50,9 +50,7 @@ class DTriangleTile(object):
       # substitution step
      ##
      def to_subtiles(self): 
-          A, B, C, D = self.pa, self.pb, self.pc, self.pd  
-          Ax, Bx, Cx, Dx, Ay, By, Cy, Dy = X(A), X(B), X(C), X(D), \
-                                           Y(A), Y(B), Y(C), Y(D)   
+          A, B, C, D = self.pa, self.pb, self.pc, self.pd    
           if self.tile_type == OTILE: 
                t1AB, t1AC = 2.0 / 3.0 * A + 1.0 / 3.0 * B,\
                             2.0 / 3.0 * A + 1.0 / 3.0 * C
@@ -145,7 +143,6 @@ class DTriangleTile(object):
                                   pc = pt1AC, 
                                   pd = trimidpt), 
                ]; 
-          #### This Needs to be filled in for the coding HOWTO (Week 2):
           else: # BTILE 
                t11, t12, t21, t22 = 1.0 / 3.0 * D + 2.0 / 3.0 * C, \
                                     1.0 / 3.0 * D + 2.0 / 3.0 * A, \
