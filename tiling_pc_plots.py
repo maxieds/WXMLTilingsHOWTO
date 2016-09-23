@@ -44,6 +44,7 @@ from AmmannA4 import AmmannA4_Tiling
 from PenroseKD import PenroseKD_Tiling
 from DiamondTriangle import DiamondTriangle_Tiling
 from TetrisTiling import Tetris_Tiling
+from Danzer7Fold import Danzer7Fold_Tiling
 
 __major_version__ = "2.0";
 __release__ = "3"; 
@@ -223,6 +224,8 @@ if __name__ == "__main__":
           tiling = DiamondTriangle_Tiling(num_steps, tiling_type);
      elif tiling_type == "Tetris": 
           tiling = Tetris_Tiling(num_steps, tiling_type);
+     elif tiling_type == "Danzer7Fold": 
+          tiling = Danzer7Fold_Tiling(num_steps, tiling_type);
      else: 
           print "Unknown tiling type: \"%s\" ... Exiting" % tiling_type; 
           sys.exit(1); 
