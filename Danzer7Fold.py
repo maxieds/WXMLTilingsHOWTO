@@ -66,8 +66,8 @@ class Danzer7FoldTile(object):
                                     pb = A, 
                                     pc = T5), 
                     Danzer7FoldTile(BLUE_TILE, 
-                                    pa = T5, 
-                                    pb = T2, 
+                                    pa = T2, 
+                                    pb = T5, 
                                     pc = T1), 
                     Danzer7FoldTile(BLUE_TILE, 
                                     pa = T2, 
@@ -75,21 +75,60 @@ class Danzer7FoldTile(object):
                                     pc = T3), 
                     Danzer7FoldTile(YELLOW_TILE, 
                                     pa = T4, 
-                                    pb = T5, 
-                                    pc = T2), 
+                                    pb = T2, 
+                                    pc = T5), 
                     Danzer7FoldTile(BLUE_TILE, 
                                     pa = T2, 
                                     pb = C, 
                                     pc = T4), 
                     Danzer7FoldTile(YELLOW_TILE, 
                                     pa = T3, 
-                                    pb = C, 
-                                    pc = T2), 
+                                    pb = T2, 
+                                    pc = C), 
                ]; 
           #### !!!! Fill these coordinates in for the HOWTO !!!! ####
           elif self.tile_type == ORANGE_TILE: 
+               Rab, Rbc, Rac, Rmid = 2.0 * sc3 + sc2, 2.0 * sc3 + sc2, \
+                                     sc1 + sc3, sc3 + sc2
+               T1 = midpoint2(sc3 / Rab, A, B)
+               T2 = midpoint2(sc3 / Rab, B, A)
+               T3 = midpoint2(sc3 / Rbc, B, C)
+               T4 = midpoint2(sc3 / Rbc, C, B)
+               T5 = midpoint2(sc1 / Rac, C, A)
+               T6 = midpoint2(sc3 / Rmid, T2, T5)
                return [
-                    Danzer7FoldTile(ORANGE_TILE, A, B, C), 
+                    Danzer7FoldTile(ORANGE_TILE, 
+                                    pa = T1, 
+                                    pb = A, 
+                                    pc = T6), 
+                    Danzer7FoldTile(BLUE_TILE, 
+                                    pa = T2, 
+                                    pb = T6, 
+                                    pc = T1), 
+                    Danzer7FoldTile(ORANGE_TILE, 
+                                    pa = T2, 
+                                    pb = T6, 
+                                    pc = T3), 
+                    Danzer7FoldTile(ORANGE_TILE, 
+                                    pa = T2, 
+                                    pb = B, 
+                                    pc = T3), 
+                    Danzer7FoldTile(YELLOW_TILE, 
+                                    pa = T6, 
+                                    pb = A, 
+                                    pc = T5), 
+                    Danzer7FoldTile(BLUE_TILE, 
+                                    pa = T6, 
+                                    pb = C, 
+                                    pc = T5), 
+                    Danzer7FoldTile(ORANGE_TILE, 
+                                    pa = T6, 
+                                    pb = C, 
+                                    pc = T4), 
+                    Danzer7FoldTile(BLUE_TILE, 
+                                    pa = T3, 
+                                    pb = T6, 
+                                    pc = T4),  
                ]; 
           elif self.tile_type == YELLOW_TILE: 
                return [
