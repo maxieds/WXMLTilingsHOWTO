@@ -263,7 +263,7 @@ if __name__ == "__main__":
           tiling_image.show()
           print "   Saved tiling image to \"%s\" ... " % image_path; 
      ## if 
-     sys.exit(0);
+     #sys.exit(0);
      
      tiling_points = Tiling.tiling_to_points(tiles, True); 
      num_tiling_points = len(tiling_points); 
