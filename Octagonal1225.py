@@ -15,7 +15,8 @@ SQUARE_TILE = 1;
 HOUSE_TILE = 2;  
 
 T = 10.0
-S = n(3 + 2 * sqrt(2))
+#S = n(sqrt(3 + 2 * sqrt(2)))
+S = n(1 + sqrt(2))
 X = T / (S - 1)
 H = n((2.0 * S * T - 2 * sqrt(4 * T**2 - (S**2 - 4) * X**2)) / (S**2 - 4))
 
@@ -56,12 +57,9 @@ class Octagonal1225Tile(object):
           P = lambda tile, vertex: tile[vertex - 1]
           if self.tile_type == SQUARE_TILE: 
                t, sf = edist(p1, p2), 1 / S
-               #M, T = sf * matrix([[1, 0], [0, 1]]), V((1 - sf) * t, 0)
-               #square_top = AffineTransformOp(M, T)
-               #square = Tiling.transform_points(self.to_points(), square_top)
-               s1, s2 = midpoint2((1 - sf) * t, p2, p1), p2
-               p41, p42 = midpoint2((1 - sf) * t, p1, p4), midpoint2((1 - sf) * t, p2, p3)
-               s3, s4 = p42, midpoint2((1 - sf) * t, p42, p41)
+               s1, s2 = midpoint2(sf, p2, p1), p2
+               p41, p42 = midpoint2(sf, p1, p4), midpoint2(sf, p2, p3)
+               s3, s4 = p42, midpoint2(sf, p42, p41)
                square = [s1, s2, s3, s4]
                h1tile = Octagonal1225Tile(HOUSE_TILE, p1, P(square, 1), \
                                           P(square, 4), p4)
@@ -72,7 +70,25 @@ class Octagonal1225Tile(object):
                next_tiles = [square_tile, h1tile, h2tile]; 
           
           else: ## HOUSE_TILE
-               next_tiles = [self];
+               sf, x, side3 = 1 / S, edist(p1, p2), edist(p2, p3)
+               
+               h1offset = midpoint2(sf * x / edist(p1, p4), p1, p4)
+               h1M, h1T = sf * matrix([[1, 0], [0, 1]]), V(0, 0)
+               h1op = AffineTransformOp(h1M, h1T)
+               h1 = Tiling.transform_points(self.to_points(), h1op)
+               h1Txy = h1offset - P(h1, 1)
+               h1 = map(lambda v: v + h1Txy, h1)
+               
+               s21 = midpoint2(sf, p3, p2)
+               s13, s12 = midpoint(P(h1, 3), p3), midpoint(P(h1, 2), s21)
+               s1 = [P(h1, 2), s12, s13, P(h1, 3)]
+               s2 = [s12, s21, p3, s13]
+               
+               next_tiles = [
+                    Octagonal1225Tile(HOUSE_TILE, h1[0], h1[1], h1[2], h1[3]),       ## h1
+                    Octagonal1225Tile(SQUARE_TILE, s1[0], s1[1], s1[2], s1[3]),      ## s1
+                    Octagonal1225Tile(SQUARE_TILE, s2[0], s2[1], s2[2], s2[3]),      ## s2
+               ];
           ##
           return next_tiles; 
 
