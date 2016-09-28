@@ -46,6 +46,7 @@ from DiamondTriangle import DiamondTriangle_Tiling
 from TetrisTiling import Tetris_Tiling
 from Danzer7Fold import Danzer7Fold_Tiling
 from WaltonChair import WaltonChair_Tiling
+from Octagonal1225 import Octagonal1225_Tiling
 
 __major_version__ = "2.0";
 __release__ = "3"; 
@@ -229,6 +230,8 @@ if __name__ == "__main__":
           tiling = Danzer7Fold_Tiling(num_steps, tiling_type);
      elif tiling_type == "WaltonChair": 
           tiling = WaltonChair_Tiling(num_steps, tiling_type);
+     elif tiling_type == "Octagonal1225": 
+          tiling = Octagonal1225_Tiling(num_steps, tiling_type);
      else: 
           print "Unknown tiling type: \"%s\" ... Exiting" % tiling_type; 
           sys.exit(1); 
@@ -269,7 +272,7 @@ if __name__ == "__main__":
           tiling_image.show()
           print "   Saved tiling image to \"%s\" ... " % image_path; 
      ## if 
-     #sys.exit(0);
+     sys.exit(0);
      
      tiling_points = Tiling.tiling_to_points(tiles, True); 
      num_tiling_points = len(tiling_points); 

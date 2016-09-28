@@ -5,6 +5,7 @@
 
 import numpy as np
 import pprint 
+from math import sin, cos
 
 from sage.all import *
 from AffineTransformOp import AffineTransformOp
@@ -29,6 +30,9 @@ def Y(input_point): return input_point[1] if input_point != None else None;
 def V(x, y): return vector([x, y])
 def midpoint(A, B): return (A + B) / 2.0
 def midpoint2(t, A, B): return (1 - float(t)) * A + float(t) * B
+
+def RotationMatrix(theta): matrix([[cos(theta), -1 * sin(theta), \
+                                   [sin(theta), cos(theta)]])
 
 def get_solutionsXY(solns):
      if solns == None: 

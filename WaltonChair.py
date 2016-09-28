@@ -1,9 +1,9 @@
-#### WaltonChair.py.py 
+#### WaltonChair.py 
 #### Implementation of the Walton chair tiling 
 #### See: http://tilings.math.uni-bielefeld.de/substitution/waltonchair/
 #### See also: https://xa.yimg.com/kq/groups/13997333/.../name/WaltonChair.pdf (on Google)
 #### Author: Maxie D. Schmidt
-#### Created: 2016.08.31
+#### Created: 2016.09.25
 
 from sage.all import *
 from Tiling import Tiling, edist, X, Y, V
@@ -49,7 +49,7 @@ class WaltonChairTile(object):
           return [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6]; 
      ## def 
      
-     ## to_substiles
+     ## to_subtiles
       # Returns a list of DominoTile objects corresponding to the next 
       # set of subtiles generated after one more step in the substitution tiling
      ##
@@ -135,7 +135,7 @@ class WaltonChair_Tiling(Tiling):
      ## def 
      
      ## get_tiles
-      # Gets the polygonal Domino tiles after N steps
+      # Gets the polygonal tiles after N steps
       # @return A list of tiles in the computed substitution tiling
      ##
      def get_tiles(self): 
