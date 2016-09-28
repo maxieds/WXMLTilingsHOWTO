@@ -1,5 +1,8 @@
 #### Octagonal1225.py 
 #### Implementation of the octagonal 1-2-2-5 tiling 
+#### (i.e., the single entry of the Tilings Encyclopedia in the intersection of 
+####  CS course numbers and the numeric digits of hacker's aliases at the 
+####  University of Illinois at Urbana-Champaign)
 #### See: http://tilings.math.uni-bielefeld.de/substitution/octagonal-1225/
 #### Author: Maxie D. Schmidt
 #### Created: 2016.09.27
