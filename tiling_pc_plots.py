@@ -94,6 +94,10 @@ argspec_option_list = [
                  action = "store_true", metavar = "COMPUTE-SLOPE-GAPS", 
                  dest = "use_slope_gaps", default = False, 
                  help = "Compute histograms of the tiling point *slope gaps* (Defaults to pc)"), 
+     make_option("-i", "--image-only", 
+                 action = "store_true", metavar = "COMPUTE-IMAGE-ONLY", 
+                 dest = "image_only", default = False, 
+                 help = "Compute and save the image of the tiling only before exiting"), 
      make_option("-v", "--verbose", 
                  action = "store_true", 
                  dest = "verbose", 
@@ -124,6 +128,7 @@ if __name__ == "__main__":
      num_steps = int(eval(cmdline_opts.num_steps)); 
      tiling_type = str(cmdline_opts.tiling_id); 
      save_image = bool(cmdline_opts.save_image); 
+     image_only = bool(cmdline_opts.image_only); 
      num_bins = int(cmdline_opts.num_bins); 
      use_edist_squared = bool(cmdline_opts.use_edist_squared); 
      use_angle_gaps = bool(cmdline_opts.use_angle_gaps); 
@@ -272,7 +277,9 @@ if __name__ == "__main__":
           tiling_image.show()
           print "   Saved tiling image to \"%s\" ... " % image_path; 
      ## if 
-     #sys.exit(0);
+     if image_only: 
+          sys.exit(0);
+     ##
      
      tiling_points = Tiling.tiling_to_points(tiles, True); 
      num_tiling_points = len(tiling_points); 
