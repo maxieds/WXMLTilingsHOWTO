@@ -47,6 +47,7 @@ from TetrisTiling import Tetris_Tiling
 from Danzer7Fold import Danzer7Fold_Tiling
 from WaltonChair import WaltonChair_Tiling
 from Octagonal1225 import Octagonal1225_Tiling
+from AmmannA3 import AmmannA3_Tiling
 
 __major_version__ = "2.0";
 __release__ = "3"; 
@@ -237,6 +238,8 @@ if __name__ == "__main__":
           tiling = WaltonChair_Tiling(num_steps, tiling_type);
      elif tiling_type == "Octagonal1225": 
           tiling = Octagonal1225_Tiling(num_steps, tiling_type);
+     elif tiling_type == "AmmannA3": 
+          tiling = AmmannA3_Tiling(num_steps, tiling_type);
      else: 
           print "Unknown tiling type: \"%s\" ... Exiting" % tiling_type; 
           sys.exit(1); 
