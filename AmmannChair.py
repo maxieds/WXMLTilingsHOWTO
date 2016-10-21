@@ -18,6 +18,7 @@ SA3_TILE = 2
  # A python float of the square root of the golden ratio
 ##
 gamma = float(golden_ratio ** 0.5); 
+#gamma = var('gamma')
 
 ## AmmannChair_Tiling
  # A Tiling subclass implementing the Ammann Chair tiling 

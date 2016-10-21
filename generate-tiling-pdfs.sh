@@ -7,6 +7,9 @@ OUTPUT=./output
 TILING=$1
 SAGE=sage
 FILES=""
+COMPFORMIMGS=output/comp-form-images
+
+mkdir -p $COMPFORMIMGS
 
 #### Generate the histogram images: 
 for N in `seq $2 $3`; 
@@ -18,6 +21,13 @@ do
      $SAGE -python tiling_pc_plots.py -t $TILING -s -n $N -l
      $SAGE -python tiling_pc_plots.py -t $TILING -s -n $N -g
 done
+
+echo "Copying and renaming comparsion form images ... "
+cp output/$TILING-NUMBINS*-N.`printf "%03d" $3`-*.png $COMPFORMIMGS/
+cd $COMPFORMIMGS
+#rename "s/-N.`printf %03d $3`//" ./*.png
+rename "s/-N.[0-9][0-9][0-9]//" ./*.png
+cd ..
 
 echo "Regenerating PDFs for tiling \"$TILING\" ... "
 
@@ -31,7 +41,7 @@ echo "Calling PDFJAM for tiling \"$TILING\" ... "
 
 #### Compile the summary pdfs for this tiling: 
 SUFFIX=("pc-edist" "pc-edistsq" "angles" "anglegaps" "slopes" "slopegaps")
-NUMBINS=("000150" "000500" "010000")
+NUMBINS=("000150" "000750" "005000" "010000")
 for suffix in "${SUFFIX[@]}";
 do 
      FILES=""
@@ -45,12 +55,12 @@ do
      $PDFJAM --outfile ../pdfs/$TILING-$suffix.pdf $FILES 
 done 
 
-suffix="tiling"
-for pdf in $(ls $TILING-*$suffix.png.pdf); 
+FILES=""
+for pdf in $(ls $TILING-N.*-tiling.png.pdf); 
 do 
      FILES="$FILES $pdf"
 done 
-$PDFJAM --outfile ../pdfs/$TILING-$suffix.pdf $FILES 
+$PDFJAM --outfile ../pdfs/$TILING-tiling.pdf $FILES 
 
 rm *png.pdf
 

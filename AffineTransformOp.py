@@ -5,6 +5,9 @@
 
 from sage.all import vector, matrix
 
+IDENTITY_MATRIX = matrix([[1, 0], [0, 1]])
+def minverse(mtrx): return mtrx.inverse()
+
 ## 
  # AffineTransformOp
  # Defines a 2x2 affine transformation on points in R^2

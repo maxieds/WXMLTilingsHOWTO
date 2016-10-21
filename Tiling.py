@@ -14,6 +14,8 @@ __major_version__ = "0.0";
 __release__ = "1"; 
 __version__ = "%s.%s" % (__major_version__, __release__); 
 
+NUMCPUS = 8
+
 ## pifp
  # A python float of the PI constant
 ##
@@ -43,6 +45,7 @@ def get_solutionsXY(solns):
 ## def
 
 ## solve_system
+@parallel(NUMCPUS)
 def solve_system(Axy, RA, Bxy, RB, cond_func = lambda x, y: True):
      [Ax, Ay], [Bx, By] = Axy, Bxy
      nfunc = lambda x: Rational(x)
@@ -50,10 +53,10 @@ def solve_system(Axy, RA, Bxy, RB, cond_func = lambda x, y: True):
      Mx, My = var('Mx My')
      eqn1 = (Ax - Mx) ** 2 + (Ay - My) ** 2 == RA ** 2
      eqn2 = (Bx - Mx) ** 2 + (By - My) ** 2 == RB ** 2
-     print "solve_system: ", eqn1, eqn2
+     #print "solve_system: ", eqn1, eqn2
      solns = solve([eqn1, eqn2], Mx, My)
      solns = get_solutionsXY(solns)
-     print "solve_system: ", solns, "\n"
+     #print "solve_system: ", solns, "\n"
      for [x, y] in solns:
           if cond_func(x, y):
                return [x, y]
@@ -328,6 +331,7 @@ class Tiling(object):
       # @return              A list of the pair correlation distance data
      ##
      @staticmethod 
+     @parallel(NUMCPUS)
      def compute_pc_edists(tiling_points, edist_squared = False, sort_edists = False): 
           
           edist_pow = 0.5; 
@@ -359,6 +363,7 @@ class Tiling(object):
       # @return              A list of angles of the tiling points 
      ##
      @staticmethod
+     @parallel(NUMCPUS)
      def compute_sorted_angles(tiling_points): 
      
           angles = []; 
@@ -379,6 +384,7 @@ class Tiling(object):
       #                      between neighboring points in the sorted angle list
      ##
      @staticmethod 
+     @parallel(NUMCPUS)
      def compute_angle_gaps(tiling_points): 
           
           angles = Tiling.compute_sorted_angles(tiling_points); 
@@ -401,6 +407,7 @@ class Tiling(object):
       # @return              A sorted list of tiling point slopes
      ##
      @staticmethod
+     @parallel(NUMCPUS)
      def compute_sorted_slopes(tiling_points): 
      
           slopes = []; 
@@ -421,6 +428,7 @@ class Tiling(object):
       #                      between neighboring points in the sorted slope list
      ##
      @staticmethod 
+     @parallel(NUMCPUS)
      def compute_slope_gaps(tiling_points): 
           
           slopes = Tiling.compute_sorted_slopes(tiling_points); 

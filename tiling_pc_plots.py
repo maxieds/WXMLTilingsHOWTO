@@ -48,6 +48,7 @@ from Danzer7Fold import Danzer7Fold_Tiling
 from WaltonChair import WaltonChair_Tiling
 from Octagonal1225 import Octagonal1225_Tiling
 from AmmannA3 import AmmannA3_Tiling
+from Fibonacci2D import Fibonacci2D_Tiling
 
 __major_version__ = "2.0";
 __release__ = "3"; 
@@ -138,108 +139,157 @@ if __name__ == "__main__":
      use_slope_gaps = bool(cmdline_opts.use_slope_gaps); 
      conf_file_path = str(cmdline_opts.conf_file_path); 
      
-     tiling = Tiling(num_steps, "<Unknown Tiling>"); 
+     tiling = Tiling(num_steps, "<Unknown Tiling>");
+     inflation_factor = 1.0
      if tiling_type == "AmmannChair": 
           tiling = AmmannChair_Tiling(num_steps, tiling_type); 
+          inflation_factor = n(sqrt(golden_ratio))
      elif tiling_type == "AmmannChair2": 
           tiling = AmmannChair2_Tiling(num_steps, tiling_type); 
+          inflation_factor = 2.0
      elif tiling_type == "GoldenTriangle": 
           tiling = GoldenTriangle_Tiling(num_steps, tiling_type); 
+          inflation_factor = n(sqrt(golden_ratio))
      elif tiling_type == "Penrose": 
           tiling = Penrose_Tiling(num_steps, tiling_type); 
+          inflation_factor = n(golden_ratio)
      elif tiling_type == "Sphinx": 
           tiling = Sphinx_Tiling(num_steps, tiling_type); 
+          inflation_factor = 2.0
      elif tiling_type == "Pinwheel": 
           tiling = Pinwheel_Tiling(num_steps, tiling_type); 
+          inflation_factor = 1.0 #n(sqrt(5))
      elif tiling_type == "Squares": 
           tiling = Square_Tiling(num_steps, tiling_type); 
+          inflation_factor = 4.0
      elif tiling_type == "Triangles": 
           tiling = Triangle_Tiling(num_steps, tiling_type); 
+          inflation_factor = 1.0
      elif tiling_type == "Domino": 
           tiling = Domino_Tiling(num_steps, tiling_type); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon1": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 1, 
                    AA = 1.0, BB = 2.0, b = 1.5, c = 0.5, e = 0.5); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon2": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 2, 
                    AA = 2.5, BB = 1.3, b = 1.35, c = 0.0, e = 1.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon3": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 3, 
                    AA = 0.0, BB = 0.0, b = 0.3, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon4": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 4, 
                    AA = 2.2, BB = 0.0, b = 1.6, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon5": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 5, 
                    AA = 2.356, BB = 0.0, b = 0.5, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon8": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 8, 
                    AA = 1.571, BB = 0.0, b = 0.0, c = 0.0, e = 0.0); 
      elif tiling_type == "Pentagon10": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 10, 
                    AA = 1.4, BB = 0.0, b = 0.0, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon11": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 11, 
                    AA = 2.113, BB = 0.0, b = 0.0, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "Pentagon15": 
           tiling = Pentagon_Tiling(num_steps, tiling_type, 15, 
                    AA = 0.0, BB = 0.0, b = 0.0, c = 0.0, e = 0.0); 
+          inflation_factor = 1.0
      elif tiling_type == "SaddleConnGoldenL": 
           tiling = SaddleConnectionGoldenL(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "AmmannRhomb": 
           tiling = Ammann_Tiling(num_steps, tiling_type, RHOMB_TILE);
+          inflation_factor = n(1 + sqrt(2))
      elif tiling_type == "AmmannTriangle": 
           tiling = Ammann_Tiling(num_steps, tiling_type, TRIANGLE_TILE);
+          inflation_factor = n(1 + sqrt(2))
      elif tiling_type == "AmmannSquare": 
           tiling = Ammann_Tiling(num_steps, tiling_type, SQUARE_TILE);
+          inflation_factor = n(1 + sqrt(2))
      elif tiling_type == "AmmannEightStar": 
           tiling = Ammann_Tiling(num_steps, tiling_type, 8);
+          inflation_factor = n(1 + sqrt(2))
      elif tiling_type == "AmmannOctagon": 
           tiling = Ammann_Tiling(num_steps, tiling_type, 88);
+          inflation_factor = n(1 + sqrt(2))
      elif tiling_type == "IntegerLattice": 
           tiling = IntegerLattice_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "Chair3": 
           tiling = Chair3_Tiling(num_steps, tiling_type);
+          inflation_factor = 3.0
      elif tiling_type == "MiniTangram": 
           tiling = MiniTangram_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "Armchair": 
           tiling = Armchair_Tiling(num_steps, tiling_type);
+          inflation_factor = 2.0
      elif tiling_type == "TriTriangle": 
           tiling = TriTriangle_Tiling(num_steps, tiling_type);
+          inflation_factor = 2.0
      elif tiling_type == "Equithirds": 
           tiling = ETTriangle_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "SDHouse": 
           tiling = SDHouse_Tiling(num_steps, tiling_type);
+          inflation_factor = 2.0
      elif tiling_type == "Pentomino": 
           tiling = Pentomino_Tiling(num_steps, tiling_type);
+          inflation_factor = 2.0
      elif tiling_type == "Cesi": 
           tiling = Cesi_Tiling(num_steps, tiling_type);
+          inflation_factor = 2.0
      elif tiling_type == "STPinwheel": 
           tiling = STPinwheel_Tiling(num_steps, tiling_type);
+          inflation_factor = n(sqrt(3))
      elif tiling_type == "GRTriangle": 
           tiling = GRTriangle_Tiling(num_steps, tiling_type);
+          inflation_factor = 3.0
      elif tiling_type == "Domino-9Tile": 
           tiling = Domino9Tile_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "Trihex": 
           tiling = Trihex_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "T2000Triangle": 
           tiling = T2000Triangle_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "AmmannA4": 
           tiling = AmmannA4_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "PenroseKD": 
           tiling = PenroseKD_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "DiamondTriangle": 
           tiling = DiamondTriangle_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "Tetris": 
           tiling = Tetris_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0
      elif tiling_type == "Danzer7Fold": 
           tiling = Danzer7Fold_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "WaltonChair": 
           tiling = WaltonChair_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "Octagonal1225": 
           tiling = Octagonal1225_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
      elif tiling_type == "AmmannA3": 
           tiling = AmmannA3_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 # TODO
+     elif tiling_type == "Fibonacci2D": 
+          tiling = Fibonacci2D_Tiling(num_steps, tiling_type);
+          inflation_factor = 1.0 
      else: 
           print "Unknown tiling type: \"%s\" ... Exiting" % tiling_type; 
           sys.exit(1); 
@@ -308,9 +358,12 @@ if __name__ == "__main__":
           scaling_factor = float( len(hist_data) ** 2 ); 
      ## if 
      for (idx, hd) in enumerate(hist_data): 
-          hist_data[idx] = scaling_factor * hd; 
+          hist_data[idx] = scaling_factor * hd * int(ceil(inflation_factor ** num_steps)); 
      ## for 
      
+     #print hist_data
+     no_plot_ranges = True
+
      end_time = time.time(); 
      print "   Total time to compute histogram data: %g seconds" \
            % (end_time - start_time); 
@@ -321,18 +374,18 @@ if __name__ == "__main__":
           bin_size = (max(hist_data) - min(hist_data)) / float(num_bins); 
           bins = np.arange(min(hist_data), max(hist_data), bin_size); 
           
-          hist = histogram(hist_data, bins = bins, \
-                           xmin = pxmin, xmax = pxmax, normed = True, \
+          hist = histogram(hist_data, bins = bins, normed = True, \
                            color = 'darkorange', \
                            edgecolor = Color('darkorange').darker().html_color(), \
                            alpha = 1.0, hatch = "*", zorder = 0, align = "mid", \
                            label = "label"); 
-          if use_slope_gaps or use_slopes or use_angle_gaps or use_angles: 
+          if not no_plot_ranges: 
                hist = histogram(hist_data, bins = bins, \
+                                xmin = pxmin, xmax = pxmax, normed = True, \
                                 color = 'darkorange', \
                                 edgecolor = Color('darkorange').darker().html_color(), \
                                 alpha = 1.0, hatch = "*", zorder = 0, align = "mid", \
-                                label = "label", xmin = pxmin, xmax = pxmax, normed = True); 
+                                label = "label"); 
           ## if
                       
           hist_image_path = "./output/%s-NUMBINS.%06d-N.%03d-%s.png" \

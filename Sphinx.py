@@ -4,143 +4,88 @@
 #### AperiodicTilings`SphinxTiling` package by Uwe Grimm
 #### See: http://tilings.math.uni-bielefeld.de/substitution_rules/sphinx
 #### Author: Maxie D. Schmidt
-#### Created: 2016.03.02 
+#### Created: 2016.03.02 / 2016.10.21
 
 import numpy as np
 import math
 import sys
 
 from sage.all import *
-from AffineTransformOp import AffineTransformOp
-from Tiling import Tiling, edist, X, Y
+from AffineTransformOp import AffineTransformOp, IDENTITY_MATRIX, minverse
+from Tiling import Tiling, edist, X, Y, V, midpoint
 
 ##
  # Definition of the default scaling parameter in the inflation procedure
 ##
-SCALE_FACTOR = 2; 
+SCALE_FACTOR = 1 / 2.0
 
-## TwoVector
- # Recursive procedure to generate a vector from an input tile number
- # @param num Non-negative integer representing a tile number 
- # @return    A vector representing the input tile vertex
+## SphinxTile
+ # A class that implements 4-tile sphinx tiles
 ##
-def TwoVector(num): 
-     if num == 0: 
-          return vector([1, 0]); 
-     elif num == 1: 
-          return vector([0, 1]); 
-     elif num == 2:
-          return vector([-1, 1]); 
-     elif num == 3: 
-          return -1 * TwoVector(0); 
-     elif num == 4: 
-          return -1 * TwoVector(1); 
-     elif num == 5: 
-          return -1 * TwoVector(2); 
-     else: 
-          return TwoVector(num % 6); 
-## def 
+class SphinxTile(object): 
 
-## TileMod
- # Returns a modded integer index for the input tile's label number
- # @param num An integer tile number label
- # @return    An integer corresponding to the tile's integer label
-##
-def TileMod(num): 
-     modfn = lambda x: x + 6 * math.floor((6 - x) / 6); 
-     return np.sign(num) * modfn(abs(num) % 6); 
-## def 
-
-## TwoCoordinates
- # Returns an actual vector representing the tiling coordinates of the input 
- # local vector used in the substitution procedure
- # @param xy An input vector in local coordinates 
- # @return   A transformed vector in actual plot coordinates
-##
-def TwoCoordinates(xy): 
-     return vector([X(xy) + Y(xy) * 0.5, float(sqrt(3)) * Y(xy) * 0.5]); 
-## def 
-
-## TileCoordinates
- # Computes the local sphinx tile representation corresponding to the 
- # input parameters 
- # @param tile      An integer tile index
- # @param ref_point An integer tile reference point index 
- # @return          A corresponding polygonal tile in the sphinx tiling 
-## 
-def TileCoordinates(tile, ref_point): 
-
-     if tile == 0: 
-          print "TileInflation: Error tile need to be positive or negative"; 
-          sys.exit(1); 
-     ## if 
-    
-     mapfn = lambda l: ref_point + l; 
-     coordfn = lambda a1, a2: \
-               map(mapfn, [0, a2, a1 + a2, a1 + 2 * a2, 3 * a1]); 
+     ## __init__
+      # Initialization function for the SphinxTile class
+      # @param pi        The vector-valued vertex in the tile
+      #                  ordered counterclockwise starting from the 
+      #                  lower left point
+     ##
+     def __init__(self, p1, p2, p3, p4, p5, last_matrix): 
+          self.p1 = p1;
+          self.p2 = p2; 
+          self.p3 = p3; 
+          self.p4 = p4; 
+          self.p5 = p5; 
+          self.last_matrix = last_matrix
+     ## def 
      
-     if tile > 0: 
-          return coordfn(TwoVector(tile - 1), TwoVector(tile)); 
-     else: #tile < 0: 
-          return coordfn(TwoVector(tile + 4), TwoVector(tile + 3)); 
-     ## if 
+     ## to_points
+      # Returns a list of the vertices of the tile
+     ##
+     def to_points(self): 
+          return [self.p1, self.p2, self.p3, self.p4, self.p5]; 
+     ## def 
      
-## def 
+     ## to_subtiles
+      # Returns a list of DominoTile objects corresponding to the next 
+      # set of subtiles generated after one more step in the substitution tiling
+     ##
+     def to_subtiles(self): 
+          PP = lambda points, i: points[i - 1] 
+          p1, p2, p3, p4, p5 = self.to_points()
+          sf = SCALE_FACTOR ## deflation scaling factor
+          last_matrix = self.last_matrix
+          
+          M1 = matrix([[-1, 0], [0, 1]])
+          t12op = AffineTransformOp(sf * last_matrix * M1 * minverse(last_matrix), V(0, 0))
+          t12 = Tiling.transform_points(self.to_points(), t12op)
+          t1 = map(lambda v: v + p1 - PP(t12, 2), t12)
+          t2 = map(lambda v: v + midpoint(p1, p2) - PP(t12, 2), t12)
+          tile1 = SphinxTile(t1[0], t1[1], t1[2], t1[3], t1[4], last_matrix * M1)
+          tile2 = SphinxTile(t2[0], t2[1], t2[2], t2[3], t2[4], last_matrix * M1)
+          
+          M3 = matrix([[1, 0], [0, -1]])
+          t3op = AffineTransformOp(sf * last_matrix * M3 * minverse(last_matrix), V(0, 0))
+          t3 = Tiling.transform_points(self.to_points(), t3op)
+          t3 = map(lambda v: v + midpoint(p1, p2) - PP(t3, 5), t3)
+          tile3 = SphinxTile(t3[0], t3[1], t3[2], t3[3], t3[4], last_matrix * M3)
+          
+          M4 = 1 / 2.0 * matrix([[-1, n(sqrt(3))], [-n(sqrt(3)), -1]])
+          t4op = AffineTransformOp(sf * last_matrix * M4 * minverse(last_matrix), V(0, 0))
+          t4 = Tiling.transform_points(self.to_points(), t4op)
+          t4 = map(lambda v: v + p5 - PP(t4, 1), t4)
+          tile4 = SphinxTile(t4[0], t4[1], t4[2], t4[3], t4[4], last_matrix * M4)
+          
+          return [
+               tile1, 
+               tile2, 
+               tile3, 
+               tile4, 
+          ];
+          
+     ## def 
 
-## TileInflation
- # Performs one step forward in the tile inflation procedure
- # @param tile      The initial tile number as an integer 
- # @param ref_point Tile reference point as an integer
- # @return          A list of subtiles after one substitution step forward 
- #                  for the input tile
-##
-def TileInflation(tile, ref_point): 
-     
-     if tile > 0: 
-          inflate = lambda a1, a2, a3, a4, a5, a6, a7: \
-                    [[a6, SCALE_FACTOR * (a7 + 3 * TwoVector(a1) / 2)], 
-                     [a6, SCALE_FACTOR * (a7 + 3 * TwoVector(a1))], 
-                     [a4, SCALE_FACTOR * (a7 + 3 * TwoVector(a1) + TwoVector(a3) / 2)], 
-                     [a5, SCALE_FACTOR * (a7 + TwoVector(a2))], 
-                    ]; 
-          return inflate(TileMod(tile - 1), TileMod(tile), TileMod(tile + 1), \
-                         TileMod(tile + 2), TileMod(tile - 11), \
-                         TileMod(tile - 8), ref_point); 
-     elif tile < 0: 
-          inflate = lambda a1, a2, a3, a4, a5, a6: \
-                    [[a5, SCALE_FACTOR * (a6 + 3 * TwoVector(a1) / 2)], 
-                     [a5, SCALE_FACTOR * (a6 + 3 * TwoVector(a1))], 
-                     [a1, SCALE_FACTOR * (a6 + 3 * TwoVector(a1) + TwoVector(a3) / 2)], 
-                     [a4, SCALE_FACTOR * (a6 + TwoVector(a2))], 
-                    ]; 
-          return inflate(TileMod(tile - 2), TileMod(tile - 3), \
-                         TileMod(tile - 4), TileMod(tile + 11), \
-                         TileMod(tile + 8), ref_point); 
-     else: 
-          print "TileInflation: Error tile need to be positive or negative"; 
-          sys.exit(1); 
-     ## if 
-
-## def 
-
-## Inflate
- # Gets the next list of tiles after one subsequent substitution step
- # @param tiles_list A list of previous tiles in the substitution procedure 
- # @return           A list of subtiles representing one step forward in the 
- #                   substitution procedure 
-##
-def Inflate(tiles_list): 
-     
-     mapfn = lambda input_list: \
-             TileInflation(input_list[0], input_list[1]); 
-     next_tiles_list = map(mapfn, tiles_list); 
-     rtiles_list = []; 
-     for tlist in next_tiles_list: 
-          rtiles_list.extend(tlist); 
-     ## for 
-     return rtiles_list; 
-
-## def 
+## class 
 
 ## Sphinx_Tiling
  # A Tiling subclass implementing the sphinx tiling 
@@ -157,7 +102,14 @@ class Sphinx_Tiling(Tiling):
      def __init__(self, num_steps_N, tiling_name_str = "Sphinx"): 
           self.num_steps = num_steps_N; 
           self.tiling_name = tiling_name_str; 
-          self.INIT_TILE = [];
+          self.INIT_TILE = [
+               vector([0, 0]), 
+               vector([3, 0]), 
+               vector([5.0 / 2.0, sqrt(3) / 2.0]), 
+               vector([3.0 / 2.0, sqrt(3) / 2.0]), 
+               vector([1, sqrt(3)]), 
+          ];
+          self.INIT_TILE = map(n, self.INIT_TILE)
      ## def 
      
      ## desc 
@@ -178,7 +130,12 @@ class Sphinx_Tiling(Tiling):
       # @return                  A list of tiles after one more step
      ##
      def get_next_tiling(self, prev_tiles): 
-          return Inflate(prev_tiles); 
+          next_tiles = []; 
+          for tile in prev_tiles: 
+               subtiles = tile.to_subtiles(); 
+               next_tiles.extend(subtiles); 
+          ## for 
+          return next_tiles; 
      ## def 
      
      ## get_tiles
@@ -187,21 +144,21 @@ class Sphinx_Tiling(Tiling):
      ##
      def get_tiles(self): 
           
-          init_tile = [1, vector([0, 0])]; 
+          init_tile = SphinxTile(self.INIT_TILE[0], \
+                                 self.INIT_TILE[1], self.INIT_TILE[2], \
+                                 self.INIT_TILE[3], self.INIT_TILE[4], \
+                                 IDENTITY_MATRIX);  
           tile_list = [init_tile]; 
           for n in range(1, self.N): 
                next_tiles_list = self.get_next_tiling(tile_list); 
                tile_list = next_tiles_list;
           ## for 
           
-          tile_points = []; 
-          for tile in tile_list: 
-               tile_coords = TileCoordinates(tile[0], tile[1]); 
-               two_coords = map(TwoCoordinates, tile_coords); 
-               tile_points.append(two_coords); 
+          rtiles_list = []; 
+          for (idx, stile) in enumerate(tile_list): 
+               rtiles_list.append(stile.to_points()); 
           ## for 
-          
-          return tile_points; 
+          return rtiles_list; 
 
      ## def 
 
