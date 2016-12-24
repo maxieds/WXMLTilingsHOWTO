@@ -7,6 +7,7 @@ import sys
 import time
 import numpy as np
 import pprint 
+import statistics as statpdf
 
 from optparse import OptionParser, SUPPRESS_HELP, make_option
 from sage.all import *
@@ -49,6 +50,8 @@ from WaltonChair import WaltonChair_Tiling
 from Octagonal1225 import Octagonal1225_Tiling
 from AmmannA3 import AmmannA3_Tiling
 from Fibonacci2D import Fibonacci2D_Tiling
+from PChairs import PChairs_Tiling
+from TubingenTriangle import TubingenTriangle_Tiling
 
 __major_version__ = "2.0";
 __release__ = "3"; 
@@ -111,7 +114,8 @@ argspec_usage = "%prog [-v] [-h] [--version] [-s] [-q] [-d] [-n NUM-STEPS] [-t T
 argspec_version = "%prog 1.0" 
 
 #num_bins_arr = [10, 15, 25, 35, 50, 75, 85, 100, 125, 150, 175, 200, 250, 500, 750, 1000, 2000, 5000, 7500, 10000];
-num_bins_arr = [100, 150, 200, 250, 750, 1000, 5000, 10000];
+num_bins_arr = [100, 150, 200, 250, 750, 1000, 5000, 10000, \
+                20000, 30000, 40000, 50000] + [75000, 110000, 150000];
 ## __main__
  # The main runner code when the program is called from the commandline. 
  # The code parses the commandline arguments (and the config file), 
@@ -277,10 +281,10 @@ if __name__ == "__main__":
           inflation_factor = 1.0
      elif tiling_type == "Danzer7Fold": 
           tiling = Danzer7Fold_Tiling(num_steps, tiling_type);
-          inflation_factor = 1.0 # TODO
+          inflation_factor = 1 + n(sin(2.0 * pi / 7.0) / sin(pi / 7.0))
      elif tiling_type == "WaltonChair": 
           tiling = WaltonChair_Tiling(num_steps, tiling_type);
-          inflation_factor = 1.0 # TODO
+          inflation_factor = n(sqrt(2))
      elif tiling_type == "Octagonal1225": 
           tiling = Octagonal1225_Tiling(num_steps, tiling_type);
           inflation_factor = 1.0 # TODO
@@ -289,7 +293,13 @@ if __name__ == "__main__":
           inflation_factor = 1.0 # TODO
      elif tiling_type == "Fibonacci2D": 
           tiling = Fibonacci2D_Tiling(num_steps, tiling_type);
-          inflation_factor = 1.0 
+          inflation_factor = 1.0
+     elif tiling_type == "PChairs": 
+          tiling = PChairs_Tiling(num_steps, tiling_type);
+          inflation_factor = 3.0 / 2.0 * n(sqrt(2))
+     elif tiling_type == "TubingenTriangle": 
+          tiling = TubingenTriangle_Tiling(num_steps, tiling_type);
+          inflation_factor = n(golden_ratio)
      else: 
           print "Unknown tiling type: \"%s\" ... Exiting" % tiling_type; 
           sys.exit(1); 
@@ -354,15 +364,23 @@ if __name__ == "__main__":
      scaling_factor = 1.0;
      if tiling_type == "IntegerLattice":
           scaling_factor = (LARGE_RADIUSR ** 2); 
+     elif tiling_type == "SaddleConnGoldenL":
+          scaling_factor = num_steps ** 2
      elif hist_type_desc == "anglegaps" or hist_type_desc == "slopegaps": 
           scaling_factor = float( len(hist_data) ** 2 ); 
      ## if 
      for (idx, hd) in enumerate(hist_data): 
-          hist_data[idx] = scaling_factor * hd * int(ceil(inflation_factor ** num_steps)); 
+          hist_data[idx] = scaling_factor * hd * (inflation_factor ** num_steps); 
      ## for 
      
-     #print hist_data
-     no_plot_ranges = True
+     no_plot_ranges = False
+
+     ## smooth approximating curves:
+     staty, statx = statpdf.pdf(hist_data)
+     fitcurve = list_plot(zip(statx, staty), plotjoined = True, 
+                          rgbcolor = Color('darkorange').darker(0.75), 
+                          #thickness = 2, linestyle = 'dashed'); 
+                          thickness = 1.5, linestyle = 'dashed'); 
 
      end_time = time.time(); 
      print "   Total time to compute histogram data: %g seconds" \
@@ -387,7 +405,7 @@ if __name__ == "__main__":
                                 alpha = 1.0, hatch = "*", zorder = 0, align = "mid", \
                                 label = "label"); 
           ## if
-                      
+          
           hist_image_path = "./output/%s-NUMBINS.%06d-N.%03d-%s.png" \
                             % (tiling.name, num_bins, num_steps, hist_type_desc);
           hist_title =  "Histogram Parameters (%s):\n" % tiling.name; 
@@ -404,9 +422,13 @@ if __name__ == "__main__":
           #     font_weight = 'bold', font_size = 'x-small', 
           #     shadow = True, handlelength = 2); 
           hist.axes_labels(['hist value (x)', 'count (y)']); 
-     
-          hist.show(title = hist_image_path, fontsize = 10);
-          hist.save(hist_image_path, title = hist_title, fontsize = 8); 
+
+          full_hist_plot = Graphics()
+          full_hist_plot += hist
+          full_hist_plot += fitcurve
+          
+          full_hist_plot.show(title = hist_image_path, fontsize = 10);
+          full_hist_plot.save(hist_image_path, title = hist_title, fontsize = 8); 
      
           print "   Saved pc histogram image to \"%s\" ... " % hist_image_path; 
           print "   Total time to generate histogram: %g seconds (%g sec)" \
