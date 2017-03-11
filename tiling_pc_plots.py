@@ -383,7 +383,7 @@ if __name__ == "__main__":
      if tiling_type == "IntegerLattice":
           scaling_factor = (LARGE_RADIUSR ** 2); 
      elif hist_type_desc == "anglegaps" or hist_type_desc == "slopegaps": 
-          scaling_factor = (num_steps ** 2) #/ float( len(hist_data) ); 
+          scaling_factor = (num_steps ** 2) / float( len(hist_data) ); 
      ## 
      temp_hist_data = hist_data
      hist_data = []
