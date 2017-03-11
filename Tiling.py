@@ -15,6 +15,7 @@ __release__ = "1";
 __version__ = "%s.%s" % (__major_version__, __release__); 
 
 NUMCPUS = 8
+FPNUM_DIGITS = 6
 
 ## pifp
  # A python float of the PI constant
@@ -33,8 +34,15 @@ def V(x, y): return vector([x, y])
 def midpoint(A, B): return (A + B) / 2.0
 def midpoint2(t, A, B): return (1 - float(t)) * A + float(t) * B
 
-def RotationMatrix(theta): matrix([[cos(theta), -1 * sin(theta)], \
-                                   [sin(theta), cos(theta)]])
+def RotationMatrix(theta): return matrix([[cos(theta), -1 * sin(theta)], \
+                                          [sin(theta), cos(theta)]])
+
+def round_coordinate(coord): return round(coord, FPNUM_DIGITS)
+def round_vector(v): return V(round_coordinate(X(v)), round_coordinate(Y(v)))
+
+def filter_nonzero(gaplst, round_prec = 0.0001): 
+     return list(filter(lambda gap: abs(gap) > round_prec, gaplst))
+##
 
 def get_solutionsXY(solns):
      if solns == None: 
@@ -42,10 +50,8 @@ def get_solutionsXY(solns):
      XYsol_func = lambda i: [real(n(solns[i][0].rhs())), real(n(solns[i][1].rhs()))]
      XYsols = map(XYsol_func, range(0, len(solns)))
      return XYsols
-## def
+##
 
-## solve_system
-@parallel(NUMCPUS)
 def solve_system(Axy, RA, Bxy, RB, cond_func = lambda x, y: True):
      [Ax, Ay], [Bx, By] = Axy, Bxy
      nfunc = lambda x: Rational(x)
@@ -73,7 +79,7 @@ def solve_system(Axy, RA, Bxy, RB, cond_func = lambda x, y: True):
  #              (defaults to the normal sqpow = 1/2)
  # @return      The (power modified) Euclidean distance between the points
 ##
-def edist(p0, p1, sqpow = 0.5): 
+def edist(p0, p1 = V(0, 0), sqpow = 0.5): 
      (x1, y1, x2, y2) = (p0[0], p0[1], p1[0], p1[1]); 
      return ( ((x1 - x2) ** 2) + ((y1 - y2) ** 2) ) ** sqpow; 
 ##def 
@@ -127,8 +133,13 @@ def sort_points_1D(points_list, sort_by_ycoords = False):
 def unique_points(points_list, perform_sort = True): 
 
      if perform_sort == True: 
-          points_list = sort_points_complex(points_list); 
+          #points_list = sort_points_complex(points_list); 
+          points_list = sorted(points_list)
      ## if 
+
+     ## Round floating point numbers to avoid zero gaps from non-distinct 
+     ## points that are numerically very close: 
+     points_list = map(round_vector, points_list)
 
      (last_xc, last_yc) = points_list[0]; 
      uidx = 1; 
@@ -160,6 +171,10 @@ def unique_points_1D(points_list, perform_sort = True):
      if perform_sort == True: 
           points_list = sort_points_1D(points_list); 
      ## if 
+
+     ## Round floating point numbers to avoid zero gaps from non-distinct 
+     ## points that are numerically very close: 
+     points_list = map(round_coordinate, points_list)
 
      last_point = points_list[0]; 
      uidx = 1; 
@@ -331,7 +346,6 @@ class Tiling(object):
       # @return              A list of the pair correlation distance data
      ##
      @staticmethod 
-     @parallel(NUMCPUS)
      def compute_pc_edists(tiling_points, edist_squared = False, sort_edists = False): 
           
           edist_pow = 0.5; 
@@ -363,7 +377,6 @@ class Tiling(object):
       # @return              A list of angles of the tiling points 
      ##
      @staticmethod
-     @parallel(NUMCPUS)
      def compute_sorted_angles(tiling_points): 
      
           angles = []; 
@@ -372,7 +385,9 @@ class Tiling(object):
                angle = math.atan2(y, x) / (2 * pifp); 
                angles.append(angle); 
           ## for 
-          angles = unique_points_1D(angles, perform_sort = True); 
+          #angles = unique_points_1D(angles, perform_sort = True); 
+          #angles = list(np.sort(np.unique(angles)))
+          angles = sorted(list(angles))
           return angles; 
      
      ## def 
@@ -384,7 +399,6 @@ class Tiling(object):
       #                      between neighboring points in the sorted angle list
      ##
      @staticmethod 
-     @parallel(NUMCPUS)
      def compute_angle_gaps(tiling_points): 
           
           angles = Tiling.compute_sorted_angles(tiling_points); 
@@ -396,6 +410,7 @@ class Tiling(object):
                gap = (angles[i] - angles[i-1]) / normalize_factor; 
                angle_gaps.append(gap); 
           ## for 
+          angle_gaps = filter_nonzero(angle_gaps)
           return angle_gaps;
      
      ## def 
@@ -407,16 +422,17 @@ class Tiling(object):
       # @return              A sorted list of tiling point slopes
      ##
      @staticmethod
-     @parallel(NUMCPUS)
      def compute_sorted_slopes(tiling_points): 
      
           slopes = []; 
           for xyv in tiling_points: 
                x, y = xyv[0], xyv[1];
-               slope = y / float(x) if x != 0 else 0.0;
-               slopes.append(slope); 
+               if x != 0: 
+                    slopes.append(y / float(x)); 
           ## for 
-          slopes = unique_points_1D(slopes, perform_sort = True); 
+          #slopes = unique_points_1D(slopes, perform_sort = True); 
+          #slopes = sorted(list(np.unique(slopes)))
+          slopes = sorted(list(slopes))
           return slopes; 
      
      ## def 
@@ -428,17 +444,32 @@ class Tiling(object):
       #                      between neighboring points in the sorted slope list
      ##
      @staticmethod 
-     @parallel(NUMCPUS)
-     def compute_slope_gaps(tiling_points): 
+     def compute_slope_gaps(tiling_points, h = 1): 
           
           slopes = Tiling.compute_sorted_slopes(tiling_points); 
           normalize_factor = 1.0; 
           #normalize_factor = 1 / (250.0 ** 2); 
           #normalize_factor = 1 / float(len(tiling_points))
           slope_gaps = []; 
-          for i in range(1, len(slopes)): 
-               gap = (slopes[i] - slopes[i-1]) / normalize_factor; 
+          for i in range(h, len(slopes)): 
+               gap = (slopes[i] - slopes[i-h]) / normalize_factor; 
                slope_gaps.append(gap); 
+          ## for 
+          slope_gaps = filter_nonzero(slope_gaps)
+          return slope_gaps;
+     
+     ## def 
+     
+     @staticmethod 
+     def compute_joint_slope_gaps(tiling_points, h1, h2): 
+          
+          slopes = Tiling.compute_sorted_slopes(tiling_points); 
+          normalize_factor = 1.0; 
+          slope_gaps = []; 
+          for i in range(max(h1, h2), len(slopes)): 
+               gap_coord1 = (slopes[i] - slopes[i-h1]) / normalize_factor; 
+               gap_coord2 = (slopes[i] - slopes[i-h2]) / normalize_factor; 
+               slope_gaps.append((gap_coord1, gap_coord2)); 
           ## for 
           return slope_gaps;
      
