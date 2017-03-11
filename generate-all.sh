@@ -24,6 +24,7 @@ $GENCMD GRTriangle 1 6
 $GENCMD IntegerLattice 1 1
 $GENCMD MiniTangram 1 6
 $GENCMD Octagonal1225 1 4
+$GENCMD PChairs 1 5
 $GENCMD Penrose 1 6
 $GENCMD PenroseKD 1 6
 $GENCMD Pentagon1 1 6
@@ -47,5 +48,6 @@ $GENCMD Tetris 1 4
 $GENCMD Triangles 1 6
 $GENCMD Trihex 1 6
 $GENCMD TriTriangle 1 10
+$GENCMD TubingenTriangle 1 10
 $GENCMD WaltonChair 1 4
 

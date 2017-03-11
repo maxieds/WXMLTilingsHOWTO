@@ -32,7 +32,6 @@ cd ..
 echo "Regenerating PDFs for tiling \"$TILING\" ... "
 
 #### Create the pdfs from the histogram and tiling image output:
-cd $OUTPUT 
 for image in $( ls $TILING-*.png ); do 
      $CONVERT $image $image.pdf
 done 
@@ -41,13 +40,13 @@ echo "Calling PDFJAM for tiling \"$TILING\" ... "
 
 #### Compile the summary pdfs for this tiling: 
 SUFFIX=("pc-edist" "pc-edistsq" "angles" "anglegaps" "slopes" "slopegaps")
-NUMBINS=("000150" "000750" "005000" "010000")
+NUMBINS=("000100" "000125" "000150" "000200", "000250", "000350")
 for suffix in "${SUFFIX[@]}";
 do 
      FILES=""
      for numbins in "${NUMBINS[@]}"; 
      do 
-          for pdf in $(ls $TILING-NUMBINS.$numbins*$suffix.png.pdf); 
+          for pdf in $(ls $TILING-NUMBINS.$numbins*-$suffix.png.pdf); 
           do 
                FILES="$FILES $pdf"
           done 
