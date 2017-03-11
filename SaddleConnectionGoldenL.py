@@ -5,39 +5,26 @@
 #### Author: Maxie D. Schmidt
 #### Created: 2016.03.15
 
+from scipy.optimize import curve_fit
+from pylab import *
+from scipy.stats.mstats import mquantiles
+import numpy as np
 from sage.all import *
 from Tiling import Tiling, edist, V, X, Y
 
 ## 
  # Python float for the golden ratio
 ## 
-u = float(golden_ratio); 
-u = phi = var('phi')
+#u = float(golden_ratio); 
+#u = phi = var('phi')
 u = golden_ratio
 
 ## 
  # Initial vector list for the iteration in compute_diagonals_first_octant
  # below
 ##
-V00 = [vector([1, 0]), vector([0, 1])]
-V00_v2 = [vector([1, 0]), vector([u, 1]), vector([u, u])]
-
-def get_vector_slope(v): 
-     if X(v) == 0: 
-          return Y(v)
-     else: 
-          return float(Y(v) / X(v))
-##
-
-def vector_slope_cmp(v1, v2): 
-     [slope1, slope2] = map(get_vector_slope, [v1, v2])
-     if slope1 == slope2: 
-          return 0
-     elif slope1 < slope2:
-          return -1
-     else: 
-          return 1
-##
+#V00 = [vector([1, 0]), vector([1, 1])]
+V00 = [vector([1, 0]), vector([u, 1]), vector([u, u])]
 
 ## compute_diagonals_first_octant
  # Computes a list of saddle connections within a given radius, Rmax
@@ -52,7 +39,8 @@ def compute_diagonals_first_octant(V0, Rmax = u):
     # fixed throughout instead of modifying V00 
     # ([i:j] would give a copy of just from i to j)
     #if not V: V[:] = [vector([1, 0]), vector([u, 1]), vector([u, u])]
-    if not V0: V0[:] = [vector([1, 0]), vector([0, 1])]
+    #if not V0: V0[:] = [vector([1, 0]), vector([1, 1])]
+    if not V0: V0[:] = [vector([1, 0]), vector([u, 1]), vector([u, u])]
 
     #j=0
     #while j< len(V)-1:
@@ -61,80 +49,13 @@ def compute_diagonals_first_octant(V0, Rmax = u):
     #    j+=1
     j=0
     while j< len(V0)-1:
-        while (Rmax >= edist(V0[j], V(0, 0)) and Rmax >= edist(V0[j+1], V(0, 0))):
-            V0[j+1:j+1] = [ u*V0[j]+V0[j+1], V0[j]+V0[j+1], V0[j] + u*V0[j+1]]
-        j+=1
-    return V0;
-    
-def compute_diagonals_first_octant2(V0, Rmax = u):
-    
-
-    # if V0 is None: V0=V00[:] #this makes a copy of V00 which holds 
-    # fixed throughout instead of modifying V00 
-    # ([i:j] would give a copy of just from i to j)
-    #if not V: V[:] = [vector([1, 0]), vector([u, 1]), vector([u, u])]
-    if not V0: V0[:] = [vector([1, 0]), vector([0, 1])]
-
-    originv, exit_loop = V(0, 0), False
-    while not exit_loop:
-         j = 0
-         while j < len(V0) - 1:
-              v, vnext = V0[j], V0[j+1]
-              if Rmax < edist(v, originv) or Rmax < edist(vnext, originv):
-                   exit_loop = True
-                   break
-              ##
-              next_three = [u*v + vnext, v + vnext, v + u*vnext]
-              v0[j:j] = next_three
-              j += 3
-         ##
-         V0 = sorted(V0, cmp = vector_slope_cmp)
-    ##
-    
-    return V0;
-    
-def compute_diagonals_first_octant_V2(V0, Rmax = u):
-    
-
-    # if V0 is None: V0=V00[:] #this makes a copy of V00 which holds 
-    # fixed throughout instead of modifying V00 
-    # ([i:j] would give a copy of just from i to j)
-    if not V0: V[:] = [vector([1, 0]), vector([u, 1]), vector([u, u])]
-
-    j=0
-    while j< len(V0)-1:
-        while (Rmax >= edist(V0[j], V(0, 0)) and Rmax >= edist(V0[j+1], V(0, 0))):
+        while Rmax >= V0[j][0] and Rmax >= V0[j+1][0]:
+            #V0[j+1:j+1] = [ u*V0[j]+V0[j+1], V0[j]+V0[j+1], V0[j] + u*V0[j+1]]
             V0[j+1:j+1] = [ u*V0[j]+V0[j+1], u*V0[j]+u*V0[j+1], V0[j] + u*V0[j+1]]
         j+=1
+        print "j: %d, len(V0) = %d" % (j, len(V0))
     return V0;
-    
-def compute_diagonals_first_octant2_V2(V0, Rmax = u):
-    
-
-    # if V0 is None: V0=V00[:] #this makes a copy of V00 which holds 
-    # fixed throughout instead of modifying V00 
-    # ([i:j] would give a copy of just from i to j)
-    if not V0: V[:] = [vector([1, 0]), vector([u, 1]), vector([u, u])]
-    V0 += map(lambda v: v / u, V0)
-
-    originv, exit_loop = V(0, 0), False
-    while not exit_loop:
-         j = 0
-         while j < len(V0) - 1:
-              v, vnext = V0[j], V0[j+1]
-              if Rmax < edist(v, originv) or Rmax < edist(vnext, originv):
-                   exit_loop = True
-                   break
-              ##
-              next_three = [u*v + vnext, u*v + u*vnext, v + u*vnext]
-              next_six = next_three + [u + vnext / u, v + vnext, v / u + vnext]
-              v0[j:j] = next_six
-              j += 6
-         ##
-         V0 = sorted(V0, cmp = vector_slope_cmp)
-    ##
-
-    return V0;
+##
 
 ## SaddleConnectionGoldenL
  # A Tiling subclass implemented to perform statistical computations on the 
@@ -174,20 +95,145 @@ class SaddleConnectionGoldenL(Tiling):
      def get_tiles(self): 
           
           # we're going to define RMax to be N here: 
-          tiles = compute_diagonals_first_octant_V2(V00_v2, Rmax = self.num_steps); 
-          #print V00; 
-          return [tiles]; 
-
-     ## def 
-     
-     def get_tiles_V2(self): 
-          
-          # we're going to define RMax to be N here: 
-          #tiles = compute_diagonals_first_octant_V2(V00_v2, Rmax = self.num_steps); 
-          tiles = compute_diagonals_first_octant2_V2(V00_v2, Rmax = self.num_steps); 
-          #print V00; 
+          tiles = compute_diagonals_first_octant(V00, Rmax = self.num_steps); 
+          #rtiles = []
+          #for tp in tiles: 
+          #     rtiles += [tp, tp / u] # "long" and "short" vectors
+          ##
+          #rtiles = list(filter(lambda v: get_vector_slope(v) <= 1, tiles))
+          tiles = list(filter(lambda (x, y): y <= x, tiles))
           return [tiles]; 
 
      ## def 
 
 ## class 
+
+phi = golden_ratio
+
+def ath(x): return 1 / 2.0 * log((1 + x) / (1 - x))
+def r(x):   return sqrt(1 - 4.0 * x)
+
+def f0inf(alpha): return 0
+def f1inf(alpha): return (1 / (alpha**2)) * log(alpha)
+def f2inf(alpha): return (1 / (alpha**2)) * (log(alpha) - 4.0 * ath(r(phi / alpha)))
+def f3inf(alpha): return (1 / (alpha**2)) * (2.0 * log(1 / phi * alpha / 2.0) +\
+                                             2.0 * log(1 - r(phi / alpha)))
+def f0phi(alpha): return 0
+def f1phi(alpha): return 1 / (alpha ** 2) * log(alpha / phi)
+def f2phi(alpha): return 1 / (alpha ** 2) * (log(alpha / phi)- 4.0 * ath(r(1 / alpha)))
+def f3phi(alpha): return 0
+
+def f0one(alpha): return 0
+def f1one(alpha): return 1 / (alpha ** 2) * log(alpha / phi)
+def f2one(alpha): return 1 / (alpha ** 2) * (log(alpha / phi)- 2.0 * ath(r(1 / alpha / phi)))
+def f3one(alpha): return 0
+
+def finf_fitfunc(x): 
+     single_var = False
+     if isinstance(x, sage.symbolic.expression.Expression) or \
+        isinstance(x, np.float64): 
+          x = [x]
+          single_var = True
+     ##
+     y = np.zeros(len(x))
+     for (i, xi) in enumerate(x): 
+          if xi <= 1: 
+               y[i] = f0inf(xi)
+          elif xi > 1 and xi <= 4 * phi:
+               y[i] = f1inf(xi)
+          elif xi > 4 * phi and xi <= phi**4:
+               y[i] = f2inf(xi)
+          else: 
+               y[i] = f3inf(xi)
+     ##
+     if single_var: 
+          y = y[0]
+     ##
+     return y
+##
+
+def fphi_fitfunc(x): 
+     single_var = False
+     if isinstance(x, sage.symbolic.expression.Expression) or \
+        isinstance(x, np.float64): 
+          x = [x]
+          single_var = True
+     ##
+     y = np.zeros(len(x))
+     for (i, xi) in enumerate(x): 
+          if xi <= phi: 
+               y[i] = f0phi(xi)
+          elif xi > phi and xi <= 4.0:
+               y[i] = f1phi(xi)
+          elif xi > 4.0 and xi <= phi**3:
+               y[i] = f2phi(xi)
+          else: 
+               y[i] = f3phi(xi)
+     ##
+     if single_var: 
+          y = y[0]
+     ##
+     return y
+##
+
+def fone_fitfunc(x): 
+     single_var = False
+     if isinstance(x, sage.symbolic.expression.Expression) or \
+        isinstance(x, np.float64): 
+          x = [x]
+          single_var = True
+     ##
+     y = np.zeros(len(x))
+     for (i, xi) in enumerate(x): 
+          if xi <= phi: 
+               y[i] = f0one(xi)
+          elif xi > phi and xi <= 4.0 / phi:
+               y[i] = f1one(xi)
+          elif xi > 4.0 / phi and xi <= phi**2:
+               y[i] = f2one(xi)
+          else: 
+               y[i] = f3one(xi)
+     ##
+     if single_var: 
+          y = y[0]
+     ##
+     return y
+##
+
+def sc_fitfunc(x): 
+     ydata = finf_fitfunc(x) + fphi_fitfunc(x) + fone_fitfunc(x)
+     return ydata
+##
+
+def SaddleConnGoldenL_finfinity(x): 
+     I0, I1, I2, I3 = (0, 1), (1, 4.0 * phi), (4.0 * phi, phi ** 4), (phi ** 4, infinity)
+     f0x, f1x, f2x, f3x = f0inf(x), f1inf(x), f2inf(x), f3inf(x)
+     return piecewise([(I0, f0x), (I1, f1x), (I2, f2x), (I3, f3x)])
+##
+
+MAX_FIT_POINTS = 100
+
+def fit_SaddleConnGoldenL_pdf(hist_data, xdata, ydata, hrange): 
+     
+     [sl, su] = hrange
+     [fl, fu] = [2.3528, 8.1976]
+     b = (fu - fl) / (su - sl)
+     c = fu - b * su
+     #if len(xdata) > 2 * MAX_FIT_POINTS: # trim to the middle 9000 x values
+     #     idxl, idxu = len(xdata) / 2 - MAX_FIT_POINTS/4, len(xdata) / 2 + MAX_FIT_POINTS/4
+     #     endu = len(xdata) - MAX_FIT_POINTS / 4 - 1
+     #     xdata = list(xdata)[idxl:idxu+1] + list(xdata)[0:MAX_FIT_POINTS/4+1] + list(xdata)[endu:]
+     #     ydata = list(ydata)[idxl:idxu+1] + list(ydata)[0:MAX_FIT_POINTS/4+1] + list(ydata)[endu:]
+     ##
+     # it appears that scipy has a bug, let's do an adjustment to make it go away:
+     if len(ydata) - len(xdata) == 1:
+          ydata = ydata[:-1]
+     ##
+     
+     fit_func_v1 = lambda x, a, b, c, d: a * sc_fitfunc(b*x+c) + d
+     fit_func = lambda x, a, d: fit_func_v1(x, a, b, c, d)
+     p, pcov = curve_fit(fit_func, xdata, ydata)#, bounds = ([0,0], [10,10]))
+     print p, pcov
+     return lambda x: fit_func(x, p[0], p[1]), (1 - c) / b, [p[0], b, c, p[1]]
+     
+##

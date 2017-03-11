@@ -17,8 +17,9 @@ SA3_TILE = 2
 ## gamma
  # A python float of the square root of the golden ratio
 ##
-gamma = float(golden_ratio ** 0.5); 
+#gamma = float(golden_ratio ** 0.5); 
 #gamma = var('gamma')
+#gamma = sqrt(golden_ratio)
 
 ## AmmannChair_Tiling
  # A Tiling subclass implementing the Ammann Chair tiling 
@@ -32,7 +33,8 @@ class AmmannChair_Tiling(Tiling):
       # @param tiling_name_str Optional tiling name string 
       #                        (defaults to "AmmannChair")
      ##
-     def __init__(self, num_steps_N, tiling_name_str = "AmmannChair"): 
+     def __init__(self, num_steps_N, tiling_name_str = "AmmannChair", 
+                  gamma = float(golden_ratio ** 0.5)): 
           self.num_steps = num_steps_N; 
           self.tiling_name = tiling_name_str; 
           self.INIT_TILE = [
