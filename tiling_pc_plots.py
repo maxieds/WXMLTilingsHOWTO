@@ -351,7 +351,7 @@ if __name__ == "__main__":
      start_time = time.time(); 
      tiles = tiling.get_tiles(); 
      
-     if save_image: 
+     if save_image or image_only: 
           tiling_image = tiling.get_tiling_image(tiles); 
           image_path = "./output/%s-N.%03d-tiling.png" % (tiling.name, num_steps); 
           tiling_image.save(image_path); 
