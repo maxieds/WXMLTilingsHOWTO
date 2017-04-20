@@ -16,7 +16,7 @@ from optparse import OptionParser, SUPPRESS_HELP, make_option
 from sage.all import *
 
 from Tiling import Tiling
-from ConfigParser import ConfigParser
+from ConfigParserLocal import ConfigParser as ConfigParserLocal
 
 from AmmannChair import AmmannChair_Tiling
 from AmmannChair2 import AmmannChair2_Tiling
@@ -338,7 +338,7 @@ if __name__ == "__main__":
           print_desc = "Pair Correlation"
      ## if 
           
-     config_params = ConfigParser(conf_file_path); 
+     config_params = ConfigParserLocal(conf_file_path); 
      pxmin, pxmax = config_params.get_plot_range(tiling_type, hist_type_desc); 
      
      print "   Tiling Name: %s" % tiling.name; 
