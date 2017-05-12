@@ -83,7 +83,7 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      plot_title_lst = map(lambda (x, y): r'$[^{% 3g}_{% 3g}]$' % (x, y), init_vectors)[0:init_conds_len]
      plot_title = "\{" + ', '.join(plot_title_lst) + ", \ldots\}"
      garray.show(title = plot_title, fontsize = 5, frame = True, typeset = 'latex', axes = False, axes_labels = ("", ""))
-     garray.save(outfile, title = plot_title, fontsize = 8, axes = False, frame = True, gridlines = False, axes_labels = ("", ""), dpi = 500, typeset = 'latex', figsize = [10, 10])
+     garray.save(outfile, title = plot_title, fontsize = 14, axes = False, frame = True, gridlines = False, axes_labels = ("", ""), typeset = 'latex', figsize = [10, 10])
      
 ## 
 
