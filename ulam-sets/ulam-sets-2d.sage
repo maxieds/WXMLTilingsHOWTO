@@ -92,9 +92,9 @@ def save_example_images(n = 10, a1a2 = [1.0, 1.0]):
      (a, b) = map(float, a1a2)
      absuffix = "a%03db%03d" % (a, b)
      initial_vector_configs = [ ## examples from Jayadev's talk and in the article: 
-          [V(1, float(golden_ratio)), V(0, 1)], 
-          [V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
-          [V(1, float(golden_ratio)), V(1, 0)], 
+          #[V(1, float(golden_ratio)), V(0, 1)], 
+          #[V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
+          #[V(1, float(golden_ratio)), V(1, 0)], 
           [V(9, 0), V(0, 9), V(1, 13)], 
           [V(2, 5), V(3, 1)], 
           [V(1, 0), V(2, 0), V(0, 1)], 
