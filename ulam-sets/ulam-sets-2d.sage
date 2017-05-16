@@ -42,6 +42,44 @@ def compute_ulam_set(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm):
      return ulam_set
 ## 
 
+def compute_ulam_set_v2(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm): 
+     [a1, a2] = a1a2
+     ulam_set, prev_elts, pwdistinct_vectors = init_vectors, init_vectors, []
+     for k in range(0, n - len(ulam_set) + 1): 
+          new_vsums = []
+          for (pidx, pelt) in enumerate(prev_elts): 
+               for (uidx, uvec) in enumerate(ulam_set): 
+                    if k == 0 and uidx <= pidx: 
+                         continue
+                    #print k, pelt, uvec, pelt != uvec, type(pelt), type(uvec)
+                    if pelt != uvec: 
+                         vsum = a1 * pelt + a2 * uvec
+                         new_vsums += [(vsum, norm_func(vsum))]
+                    ##
+               ##
+          ##
+          pwdistinct_vectors += new_vsums
+          #print "ULAM SET (%d) : " % k, ulam_set
+          #print "PREV ELTS (%d): " %k, prev_elts
+          #print "NEW VSUMS (%d): " % k, new_vsums
+          #print "PWDISTINCT (%d): " %k, pwdistinct_vectors
+          print k
+          distinct_vsums = []
+          for (idx, (vec, vecnorm)) in enumerate(pwdistinct_vectors): 
+               if pwdistinct_vectors.count((vec, vecnorm)) == 1 and ulam_set.count(vec) == 0: 
+                    distinct_vsums += [(vec, vecnorm)]
+               ##
+          ##
+          # take possibly multiple vectors with the unique smallest norm:
+          distinct_vsums = sorted(distinct_vsums, key = lambda (v, norm): norm, reverse = False)
+          vsums = list(takewhile(lambda (v, norm): norm == distinct_vsums[0][1], distinct_vsums))
+          vsums = map(lambda (vdata, norm): vector(vdata), vsums)
+          ulam_set += vsums
+          prev_elts = vsums
+     ## 
+     return ulam_set
+## 
+
 def compute_Sn_set(ulam_set, norm_func, alpha = 2.5714474995): 
      Sn = []
      for an in ulam_set: ## my guess at what the set S_N should look like in 2d: 
@@ -62,7 +100,7 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      init_conds_len = len(init_vectors)
      image_graphics = []
      for (norm_func, nfunc_desc) in norm_funcs: 
-          ulam_set = compute_ulam_set(n, init_vectors, a1a2, norm_func)
+          ulam_set = compute_ulam_set_v2(n, init_vectors, a1a2, norm_func)
           print "ULAM SET: ", ulam_set, "\n"
           gplot = point(ulam_set, pointsize=ps, axes = False, axes_labels = None, gridlines = None)
           snset = compute_Sn_set(ulam_set, norm_func)
