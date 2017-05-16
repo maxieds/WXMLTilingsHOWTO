@@ -42,8 +42,7 @@ def compute_ulam_set(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm):
      return ulam_set
 ## 
 
-def compute_ulam_set_v2(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm): 
-     [a1, a2] = a1a2
+def compute_ulam_set_v2(a1, a2, n, init_vectors, norm_func): 
      ulam_set, prev_elts, pwdistinct_vectors = init_vectors, init_vectors, []
      for k in range(0, n - len(ulam_set) + 1): 
           new_vsums = []
@@ -55,7 +54,7 @@ def compute_ulam_set_v2(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm
                     if pelt != uvec: 
                          vsum = a1 * pelt + a2 * uvec
                          new_vsums += [(vsum, norm_func(vsum))]
-                    ##
+                    ## 
                ##
           ##
           pwdistinct_vectors += new_vsums
@@ -100,7 +99,7 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      init_conds_len = len(init_vectors)
      image_graphics = []
      for (norm_func, nfunc_desc) in norm_funcs: 
-          ulam_set = compute_ulam_set_v2(n, init_vectors, a1a2, norm_func)
+          ulam_set = compute_ulam_set_v2(a1a2[0], a1a2[1], n, init_vectors, norm_func)
           print "ULAM SET: ", ulam_set, "\n"
           gplot = point(ulam_set, pointsize=ps, axes = False, axes_labels = None, gridlines = None)
           snset = compute_Sn_set(ulam_set, norm_func)
@@ -160,4 +159,59 @@ def save_example_images(n = 10, a1a2 = [1.0, 1.0]):
      ## 
      
 ##
+
+def generate_lincombo_comp_graphs(outfile_suffix, init_vectors, n, norm_func = max_norm): 
+     
+     garray_data = []
+     for a1 in range(1, 5): 
+          graphics_row = []
+          for a2 in range(1, 5): 
+               print "a1 / a2", [a1, a2]
+               ulam_set = compute_ulam_set_v2(a1, a2, n, init_vectors, norm_func) 
+               print "ULAM_SET: ", ulam_set
+               plot_title = r"$a_1$ / $a_2$ = % 3g / % 3g" % (a1, a2)
+               gplot = point(ulam_set, pointsize=2, axes = False, axes_labels = None, gridlines = None, 
+                             title = plot_title)
+               graphics_row += [gplot]
+               #graphics_row += [ulam_set]
+          ##
+          garray_data += [graphics_row]
+     ## 
+     
+     outfile = 'ulam-set-' + outfile_suffix + '.png'
+     garray = graphics_array(garray_data)
+     garray.show(fontsize = 5, frame = True, typeset = 'latex', axes = False, axes_labels = ("", ""))
+     garray.save(outfile, fontsize = 14, axes = False, frame = True, gridlines = False, 
+                 axes_labels = ("", ""), figsize = [10, 10])
+
+##
+
+a1a2_array = [ [ [1,1], [1,2], [1,3], [1,4] ], 
+               [ [2,1], [2,2], [2,3], [2,4] ], 
+               [ [3,1], [3,2], [3,3], [3,4] ], 
+               [ [4,1], [4,2], [4,3], [4,4] ]
+             ]
+initial_vector_configs = [ ## examples from Jayadev's talk and in the article: 
+          #[V(1, float(golden_ratio)), V(0, 1)], 
+          #[V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
+          #[V(1, float(golden_ratio)), V(1, 0)], 
+          [V(1, 0), V(0, 1)], 
+          #[V(9, 0), V(0, 9), V(1, 13)], 
+          #[V(2, 5), V(3, 1)], 
+          #[V(1, 0), V(2, 0), V(0, 1)], 
+          #[V(2, 0), V(0, 1), V(3, 1)], 
+          #[V(1, 0), V(0, 1), V(2, 3)], 
+          #[V(3, 0), V(0, 1), V(1, 1)], 
+          #[V(1, 0), V(2, 0), V(0, 1)], 
+          #[V(2, 0), V(3, 0), V(0, 1)], 
+          #[V(1, 0), V(0, 1), V(6, 4)], 
+          #[V(1, 0), V(0, 1), V(10, 9)], 
+          #[V(1, 0), V(0, 1), V(10, 3)], 
+          #[V(1, 3), V(3, 4)], 
+          #[V(1, 0), V(1, 1)]
+     ] 
+Nvalue = 20
+init_vectors = initial_vector_configs[0]
+
+
      
