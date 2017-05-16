@@ -1,5 +1,6 @@
 from sage.all import *
 from sage.plot.histogram import Histogram, histogram
+from itertools import takewhile
 
 def V(x, y): 
      return vector([x, y])
@@ -26,14 +27,17 @@ def compute_next_ulam_element(prev_elts, a1a2 = [1.0, 1.0], norm_func = max_norm
                distinct_vsums += [(pwd_vector_sums[idx], norm)]
           ##
      ##
-     vsum, maxnorm = min(distinct_vsums, key = lambda v: v[1])
-     return vector(vsum)
+     # take possibly multiple vectors with the unique smallest norm:
+     distinct_vsums = sorted(distinct_vsums, key = lambda (v, norm): norm, reverse = False)
+     vsums = list(takewhile(lambda (v, norm): norm == distinct_vsums[0][1], distinct_vsums))
+     vsums = map(lambda (vdata, norm): vector(vdata), vsums)
+     return vsums
 ## 
 
 def compute_ulam_set(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm): 
      ulam_set = init_vectors
      for k in range(len(ulam_set), n + 1): 
-          ulam_set += [compute_next_ulam_element(ulam_set, a1a2, norm_func)]
+          ulam_set += compute_next_ulam_element(ulam_set, a1a2, norm_func)
      ## 
      return ulam_set
 ## 
@@ -59,7 +63,7 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      image_graphics = []
      for (norm_func, nfunc_desc) in norm_funcs: 
           ulam_set = compute_ulam_set(n, init_vectors, a1a2, norm_func)
-          #print "ULAM SET: ", ulam_set, "\n"
+          print "ULAM SET: ", ulam_set, "\n"
           gplot = point(ulam_set, pointsize=ps, axes = False, axes_labels = None, gridlines = None)
           snset = compute_Sn_set(ulam_set, norm_func)
           g1, g2, g3, g4 = Graphics(), Graphics(), Graphics(), Graphics()
@@ -95,10 +99,10 @@ def save_example_images(n = 10, a1a2 = [1.0, 1.0]):
           #[V(1, float(golden_ratio)), V(0, 1)], 
           #[V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
           #[V(1, float(golden_ratio)), V(1, 0)], 
+          [V(1, 0), V(0, 1)], 
           [V(9, 0), V(0, 9), V(1, 13)], 
           [V(2, 5), V(3, 1)], 
           [V(1, 0), V(2, 0), V(0, 1)], 
-          [V(1, 0), V(0, 1)], 
           [V(2, 0), V(0, 1), V(3, 1)], 
           [V(1, 0), V(0, 1), V(2, 3)], 
           [V(3, 0), V(0, 1), V(1, 1)], 
