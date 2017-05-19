@@ -16,7 +16,7 @@ def edist(v): # === Euclidean distance squared
      return sum(comps)
 ##
 
-def compute_next_ulam_element(prev_elts, a1a2 = [1.0, 1.0], norm_func = max_norm): 
+def compute_next_ulam_element(prev_elts, a1a2 = [1, 1], norm_func = max_norm): 
      [a1, a2] = a1a2
      pwdistinct_vectors = Combinations(prev_elts, 2).list()
      pwd_vector_sums = map(lambda v12: a1 * v12[0] + a2 * v12[1], pwdistinct_vectors)
@@ -34,7 +34,7 @@ def compute_next_ulam_element(prev_elts, a1a2 = [1.0, 1.0], norm_func = max_norm
      return vsums
 ## 
 
-def compute_ulam_set(n, init_vectors, a1a2 = [1.0, 1.0], norm_func = max_norm): 
+def compute_ulam_set(n, init_vectors, a1a2 = [1, 1], norm_func = max_norm): 
      ulam_set = init_vectors
      for k in range(len(ulam_set), n + 1): 
           ulam_set += compute_next_ulam_element(ulam_set, a1a2, norm_func)
@@ -88,7 +88,7 @@ def compute_Sn_set(ulam_set, norm_func, alpha = 2.5714474995):
      return Sn
 ##
 
-def save_ulam_set_image_v2(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0], 
+def save_ulam_set_image_v2(outfile, init_vectors, n = 100, a1a2 = [1, 1], 
                            norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
            
      # plot options (change these as you will to explore): 
@@ -128,7 +128,7 @@ def save_ulam_set_image_v2(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      
 ## 
 
-def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0], 
+def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1, 1], 
                         norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
            
      # plot options (change these as you will to explore): 
@@ -152,28 +152,28 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
      
 ## 
 
-def save_example_images(n = 10, a1a2 = [1.0, 1.0]):    
+def save_example_images(n = 10, a1a2 = [1, 1]):    
      
      (a, b) = map(float, a1a2)
      absuffix = "a%03db%03d" % (a, b)
      initial_vector_configs = [ ## examples from Jayadev's talk and in the article: 
-          #[V(1, float(golden_ratio)), V(0, 1)], 
-          #[V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
-          #[V(1, float(golden_ratio)), V(1, 0)], 
-          [V(1, 0), V(0, 1)], 
-          [V(9, 0), V(0, 9), V(1, 13)], 
-          [V(2, 5), V(3, 1)], 
-          [V(1, 0), V(2, 0), V(0, 1)], 
-          [V(2, 0), V(0, 1), V(3, 1)], 
-          [V(1, 0), V(0, 1), V(2, 3)], 
-          [V(3, 0), V(0, 1), V(1, 1)], 
-          [V(1, 0), V(2, 0), V(0, 1)], 
-          [V(2, 0), V(3, 0), V(0, 1)], 
-          [V(1, 0), V(0, 1), V(6, 4)], 
-          [V(1, 0), V(0, 1), V(10, 9)], 
-          [V(1, 0), V(0, 1), V(10, 3)], 
-          [V(1, 3), V(3, 4)], 
-          [V(1, 0), V(1, 1)]
+          [V(1, golden_ratio), V(0, 1)], 
+          [V(1, golden_ratio), V(golden_ratio, 1)], 
+          [V(1, golden_ratio), V(1, 0)], 
+          #[V(1, 0), V(0, 1)], 
+          #[V(9, 0), V(0, 9), V(1, 13)], 
+          #[V(2, 5), V(3, 1)], 
+          #[V(1, 0), V(2, 0), V(0, 1)], 
+          #[V(2, 0), V(0, 1), V(3, 1)], 
+          #[V(1, 0), V(0, 1), V(2, 3)], 
+          #[V(3, 0), V(0, 1), V(1, 1)], 
+          #[V(1, 0), V(2, 0), V(0, 1)], 
+          #[V(2, 0), V(3, 0), V(0, 1)], 
+          #[V(1, 0), V(0, 1), V(6, 4)], 
+          #[V(1, 0), V(0, 1), V(10, 9)], 
+          #[V(1, 0), V(0, 1), V(10, 3)], 
+          #[V(1, 3), V(3, 4)], 
+          #[V(1, 0), V(1, 1)]
      ] 
      
      for (icidx, init_vectors) in enumerate(initial_vector_configs): 
