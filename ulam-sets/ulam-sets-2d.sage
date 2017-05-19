@@ -88,8 +88,8 @@ def compute_Sn_set(ulam_set, norm_func, alpha = 2.5714474995):
      return Sn
 ##
 
-def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0], 
-                        norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
+def save_ulam_set_image_v2(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0], 
+                           norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
            
      # plot options (change these as you will to explore): 
      thickness, sbase, aratio, ps = 2, float(golden_ratio), 'automatic', 15
@@ -119,6 +119,30 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0],
           ##
           image_graphics += [graphics_row]
           
+     ## 
+     garray = graphics_array(image_graphics)
+     plot_title_lst = map(lambda (x, y): r'$[^{% 3g}_{% 3g}]$' % (x, y), init_vectors)[0:init_conds_len]
+     plot_title = "\{" + ', '.join(plot_title_lst) + ", \ldots\}"
+     garray.show(title = plot_title, fontsize = 5, frame = True, typeset = 'latex', axes = False, axes_labels = ("", ""))
+     garray.save(outfile, title = plot_title, fontsize = 14, axes = False, frame = True, gridlines = False, axes_labels = ("", ""), typeset = 'latex', figsize = [10, 10])
+     
+## 
+
+def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1.0, 1.0], 
+                        norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
+           
+     # plot options (change these as you will to explore): 
+     thickness, sbase, aratio, ps = 2, float(golden_ratio), 'automatic', 15
+     scale_options = [('linear', 10), ('semilogy', sbase), ('semilogx', sbase), ('loglog', sbase)]
+     
+     # compute the plots: 
+     init_conds_len = len(init_vectors)
+     image_graphics = []
+     for (norm_func, nfunc_desc) in norm_funcs: 
+          ulam_set = compute_ulam_set_v2(a1a2[0], a1a2[1], n, init_vectors, norm_func)
+          print "ULAM SET: ", ulam_set, "\n"
+          gplot = point(ulam_set, pointsize=ps, axes = False, axes_labels = None, gridlines = None)
+          image_graphics += [[gplot]]     
      ## 
      garray = graphics_array(image_graphics)
      plot_title_lst = map(lambda (x, y): r'$[^{% 3g}_{% 3g}]$' % (x, y), init_vectors)[0:init_conds_len]
