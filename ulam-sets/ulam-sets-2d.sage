@@ -1,6 +1,7 @@
 from sage.all import *
 from sage.plot.histogram import Histogram, histogram
 from itertools import takewhile
+from ulam_sets import compute_ulam_set
 
 def V(x, y): 
      return vector([x, y])
@@ -15,69 +16,6 @@ def edist(v): # === Euclidean distance squared
      comps = map(lambda xycoord: xycoord ** 2, xycoords)
      return sum(comps)
 ##
-
-def compute_next_ulam_element(prev_elts, a1a2 = [1, 1], norm_func = max_norm): 
-     [a1, a2] = a1a2
-     pwdistinct_vectors = Combinations(prev_elts, 2).list()
-     pwd_vector_sums = map(lambda v12: a1 * v12[0] + a2 * v12[1], pwdistinct_vectors)
-     pwd_vector_sums2 = map(lambda vsum: norm_func(vsum), pwd_vector_sums)
-     distinct_vsums = []
-     for (idx, norm) in enumerate(pwd_vector_sums2): 
-          if pwd_vector_sums.count(pwd_vector_sums[idx]) == 1 and prev_elts.count(pwd_vector_sums[idx]) == 0: 
-               distinct_vsums += [(pwd_vector_sums[idx], norm)]
-          ##
-     ##
-     # take possibly multiple vectors with the unique smallest norm:
-     distinct_vsums = sorted(distinct_vsums, key = lambda (v, norm): norm, reverse = False)
-     vsums = list(takewhile(lambda (v, norm): norm == distinct_vsums[0][1], distinct_vsums))
-     vsums = map(lambda (vdata, norm): vector(vdata), vsums)
-     return vsums
-## 
-
-def compute_ulam_set(n, init_vectors, a1a2 = [1, 1], norm_func = max_norm): 
-     ulam_set = init_vectors
-     for k in range(len(ulam_set), n + 1): 
-          ulam_set += compute_next_ulam_element(ulam_set, a1a2, norm_func)
-     ## 
-     return ulam_set
-## 
-
-def compute_ulam_set_v2(a1, a2, n, init_vectors, norm_func): 
-     ulam_set, prev_elts, pwdistinct_vectors = init_vectors, init_vectors, []
-     for k in range(0, n - len(ulam_set) + 1): 
-          new_vsums = []
-          for (pidx, pelt) in enumerate(prev_elts): 
-               for (uidx, uvec) in enumerate(ulam_set): 
-                    if k == 0 and uidx <= pidx: 
-                         continue
-                    #print k, pelt, uvec, pelt != uvec, type(pelt), type(uvec)
-                    if pelt != uvec: 
-                         vsum = a1 * pelt + a2 * uvec
-                         new_vsums += [(vsum, norm_func(vsum))]
-                    ## 
-               ##
-          ##
-          pwdistinct_vectors += new_vsums
-          #print "ULAM SET (%d) : " % k, ulam_set
-          #print "PREV ELTS (%d): " %k, prev_elts
-          #print "NEW VSUMS (%d): " % k, new_vsums
-          #print "PWDISTINCT (%d): " %k, pwdistinct_vectors
-          print k
-          distinct_vsums = []
-          for (idx, (vec, vecnorm)) in enumerate(pwdistinct_vectors): 
-               if pwdistinct_vectors.count((vec, vecnorm)) == 1 and ulam_set.count(vec) == 0: 
-                    distinct_vsums += [(vec, vecnorm)]
-               ##
-          ##
-          # take possibly multiple vectors with the unique smallest norm:
-          distinct_vsums = sorted(distinct_vsums, key = lambda (v, norm): norm, reverse = False)
-          vsums = list(takewhile(lambda (v, norm): norm == distinct_vsums[0][1], distinct_vsums))
-          vsums = map(lambda (vdata, norm): vector(vdata), vsums)
-          ulam_set += vsums
-          prev_elts = vsums
-     ## 
-     return ulam_set
-## 
 
 def compute_Sn_set(ulam_set, norm_func, alpha = 2.5714474995): 
      Sn = []
@@ -129,7 +67,7 @@ def save_ulam_set_image_v2(outfile, init_vectors, n = 100, a1a2 = [1, 1],
 ## 
 
 def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1, 1], 
-                        norm_funcs = [(max_norm, "Max Norm"), (edist, "Euclidean Distance")]):  
+                        norm_funcs = [(max_norm, "Max Norm")]):  
            
      # plot options (change these as you will to explore): 
      thickness, sbase, aratio, ps = 2, float(golden_ratio), 'automatic', 15
@@ -139,7 +77,8 @@ def save_ulam_set_image(outfile, init_vectors, n = 100, a1a2 = [1, 1],
      init_conds_len = len(init_vectors)
      image_graphics = []
      for (norm_func, nfunc_desc) in norm_funcs: 
-          ulam_set = compute_ulam_set_v2(a1a2[0], a1a2[1], n, init_vectors, norm_func)
+          #ulam_set = compute_ulam_set_v2(a1a2[0], a1a2[1], n, init_vectors, norm_func)
+          ulam_set = compute_ulam_set(n, init_vectors)
           print "ULAM SET: ", ulam_set, "\n"
           gplot = point(ulam_set, pointsize=ps, axes = False, axes_labels = None, gridlines = None)
           image_graphics += [[gplot]]     
@@ -160,26 +99,27 @@ def save_example_images(n = 10, a1a2 = [1, 1]):
           [V(1, golden_ratio), V(0, 1)], 
           [V(1, golden_ratio), V(golden_ratio, 1)], 
           [V(1, golden_ratio), V(1, 0)], 
-          #[V(1, 0), V(0, 1)], 
-          #[V(9, 0), V(0, 9), V(1, 13)], 
-          #[V(2, 5), V(3, 1)], 
-          #[V(1, 0), V(2, 0), V(0, 1)], 
-          #[V(2, 0), V(0, 1), V(3, 1)], 
-          #[V(1, 0), V(0, 1), V(2, 3)], 
-          #[V(3, 0), V(0, 1), V(1, 1)], 
-          #[V(1, 0), V(2, 0), V(0, 1)], 
-          #[V(2, 0), V(3, 0), V(0, 1)], 
-          #[V(1, 0), V(0, 1), V(6, 4)], 
-          #[V(1, 0), V(0, 1), V(10, 9)], 
-          #[V(1, 0), V(0, 1), V(10, 3)], 
-          #[V(1, 3), V(3, 4)], 
-          #[V(1, 0), V(1, 1)]
+          [V(1, 0), V(0, 1)], 
+          [V(9, 0), V(0, 9), V(1, 13)], 
+          [V(2, 5), V(3, 1)], 
+          [V(1, 0), V(2, 0), V(0, 1)], 
+          [V(2, 0), V(0, 1), V(3, 1)], 
+          [V(1, 0), V(0, 1), V(2, 3)], 
+          [V(3, 0), V(0, 1), V(1, 1)], 
+          [V(1, 0), V(2, 0), V(0, 1)], 
+          [V(2, 0), V(3, 0), V(0, 1)], 
+          [V(1, 0), V(0, 1), V(6, 4)], 
+          [V(1, 0), V(0, 1), V(10, 9)], 
+          [V(1, 0), V(0, 1), V(10, 3)], 
+          [V(1, 3), V(3, 4)], 
+          [V(1, 0), V(1, 1)]
      ] 
      
      for (icidx, init_vectors) in enumerate(initial_vector_configs): 
           plot_suffix = "ulam-set" + "-N." + "%05d" % n + "-" + absuffix + "-v" + str(icidx + 1) + ".png"
           print "  => Saving image \"%s\" ... " % plot_suffix
-          save_ulam_set_image(plot_suffix, init_vectors, n, a1a2)
+          print map(list, init_vectors)
+          save_ulam_set_image(plot_suffix, map(tuple, init_vectors), n, a1a2)
      ## 
      
 ##
@@ -208,6 +148,38 @@ def generate_lincombo_comp_graphs(outfile_suffix, init_vectors, n, norm_func = m
      garray.save(outfile, fontsize = 14, axes = False, frame = True, gridlines = False, 
                  axes_labels = ("", ""), figsize = [10, 10])
 
+##
+
+def compute_2d_integral(n, init_vectors = [V(1, float(golden_ratio)), V(1, 0)]): 
+
+     ulam_set = compute_ulam_set_v2(1, 1, n, init_vectors, max_norm)
+     alpha, x, y = var('alpha x y')
+     N = len(ulam_set)
+     integrand = lambda x, y: sum(map(lambda (m, n): cos(2 * pi * alpha *(m*x+n*y)), ulam_set))
+     defintx = lambda y: integral(integrand(x, y), x, 0, 1)
+     defint = integral(defintx(y), y, 0, 1)
+     graphics = plot(defint, (-2*pi, 2*pi))
+     graphics += plot(N, (-2*pi, 2*pi), title = "N = %d" % N)
+     return defint, graphics
+     #print simplify(defint)
+     #print find_root(defint == -0.8 * N, 0, 2*pi)
+     #print defint.subs(alpha == 1.0).n()
+     #print map(lambda soln: soln.rhs(), solve([defint == -0.8 * N], alpha))
+
+##
+
+def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]): 
+     nvalues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 45, 50, 55]
+     garray, grow = [], []
+     for (nidx, N) in enumerate(nvalues): 
+          grow += [compute_2d_integral(N, init_vectors)]
+          if nidx % 3 == 2: 
+               garray += [grow]
+               grow = []
+          ##
+     ##
+     gplots = graphics_array(garray)
+     gplots.show(frame = True)
 ##
 
 a1a2_array = [ [ [1,1], [1,2], [1,3], [1,4] ], 
