@@ -2,6 +2,8 @@ from sage.all import *
 from sage.plot.histogram import Histogram, histogram
 from itertools import takewhile
 from ulam_sets import compute_ulam_set
+from sage.plot.colors import rainbow
+import numpy as np
 
 def V(x, y): 
      return vector([x, y])
@@ -149,17 +151,34 @@ def generate_lincombo_comp_graphs(outfile_suffix, init_vectors, n, norm_func = m
 
 ##
 
+def defint_func(m, n, alpha): 
+     if m == 0 and n == 0: 
+          return 0
+     elif m == 0: 
+          return sin(2 * alpha * n * pi) / 2.0 / alpha / n / pi
+     elif n == 0: 
+          return sin(2 * alpha * m * pi) / 2.0 / alpha / m / pi
+     else: 
+          return cos(alpha *(m+n) * pi) * sin(alpha * m * pi) * sin(alpha * n * pi) / (alpha**2) / m / n / (pi ** 2)
+     ##
+## 
+
 def compute_2d_integral(n, init_vectors = [V(1, float(golden_ratio)), V(1, 0)]): 
 
-     ulam_set = compute_ulam_set_v2(1, 1, n, init_vectors, max_norm)
+     ulam_set = compute_ulam_set(n, map(tuple, init_vectors))
      alpha, x, y = var('alpha x y')
+     defint = sum(map(lambda (m, n): defint_func(m, n, alpha), ulam_set))
+     return defint
+     
+     
      N = len(ulam_set)
      integrand = lambda x, y: sum(map(lambda (m, n): cos(2 * pi * alpha *(m*x+n*y)), ulam_set))
      defintx = lambda y: integral(integrand(x, y), x, 0, 1)
      defint = integral(defintx(y), y, 0, 1)
      graphics = plot(defint, (-2*pi, 2*pi))
      graphics += plot(N, (-2*pi, 2*pi), title = "N = %d" % N)
-     return defint, graphics
+     plot_func = lambda alpha, beta: defint(alpha)-beta*N
+     return defint, plot_func, graphics
      #print simplify(defint)
      #print find_root(defint == -0.8 * N, 0, 2*pi)
      #print defint.subs(alpha == 1.0).n()
@@ -167,7 +186,7 @@ def compute_2d_integral(n, init_vectors = [V(1, float(golden_ratio)), V(1, 0)]):
 
 ##
 
-def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]): 
+def compute_2d_integral_plots_old(init_vectors = [V(1, golden_ratio), V(1, 0)]): 
      nvalues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 45, 50, 55]
      garray, grow = [], []
      for (nidx, N) in enumerate(nvalues): 
@@ -180,6 +199,36 @@ def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]):
      gplots = graphics_array(garray)
      gplots.show(frame = True)
 ##
+
+def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]): 
+     nvalues = [25, 50, 100, 150, 250, 350, 500]
+     point_colors = rainbow(len(nvalues))
+     total_plot = Graphics()
+     for (nidx, nval) in enumerate(nvalues): 
+          print "  => N: %d" % nval
+          defint = compute_2d_integral(nval, init_vectors)
+          beta_ticks = list(np.arange(0.025, 1, 0.025))
+          alpha_values = map(lambda beta: find_root(defint(alpha) == beta * nval, 0.0001, 4), beta_ticks)
+          plot_points = zip(beta_ticks, alpha_values)
+          
+          print plot_points, "\n"
+          xtick_formatter = ["" if n > 0 and n < len(beta_ticks)-1
+                            else "%g" % n for n in range(0, len(beta_ticks))]
+          pplot = points(plot_points, pointsize = 6, 
+                         legend_label = "N = %d" % nval, 
+                         legend_color = point_colors[nidx], 
+                         rgbcolor = point_colors[nidx], 
+                         axes_labels = ["$\\beta$", "$\\alpha$"], 
+                         gridlines = True, ticks = [beta_ticks, None], 
+                         tick_formatter = [xtick_formatter, None], 
+                         title = "Looking for Hidden Signals: $\\int_0^1\\int_0^1\\sum_{1 \\leq k \\leq N} \\Re[e^{2\\pi\\imath\\alpha(mx+ny)}] dxdy = \\beta \\cdot N$")
+          total_plot += pplot
+
+     ##
+     total_plot.show()
+##
+
+
 
 a1a2_array = [ [ [1,1], [1,2], [1,3], [1,4] ], 
                [ [2,1], [2,2], [2,3], [2,4] ], 
