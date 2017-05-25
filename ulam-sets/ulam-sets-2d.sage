@@ -4,6 +4,7 @@ from itertools import takewhile
 from ulam_sets import compute_ulam_set
 from sage.plot.colors import rainbow
 import numpy as np
+from sympy import fourier_transform, inverse_fourier_transform
 
 def V(x, y): 
      return vector([x, y])
@@ -167,7 +168,7 @@ def compute_2d_integral(n, init_vectors = [V(1, float(golden_ratio)), V(1, 0)]):
 
      ulam_set = compute_ulam_set(n, map(tuple, init_vectors))
      alpha, x, y = var('alpha x y')
-     defint = sum(map(lambda (m, n): defint_func(m, n, alpha), ulam_set))
+     defint = sum(map(lambda (m, n): defint_func(float(m), float(n), alpha), ulam_set))
      return defint
      
      
@@ -200,8 +201,9 @@ def compute_2d_integral_plots_old(init_vectors = [V(1, golden_ratio), V(1, 0)]):
      gplots.show(frame = True)
 ##
 
-def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]): 
-     nvalues = [25, 50, 100, 150, 250, 350, 500]
+def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)], 
+                              plot_id = "V3"): 
+     nvalues = [25, 50, 100, 150, 250, 350, 500, 650, 750, 850, 950, 1050, 1250, 1500]
      point_colors = rainbow(len(nvalues))
      total_plot = Graphics()
      for (nidx, nval) in enumerate(nvalues): 
@@ -213,7 +215,7 @@ def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]):
           
           print plot_points, "\n"
           xtick_formatter = ["" if n > 0 and n < len(beta_ticks)-1
-                            else "%g" % n for n in range(0, len(beta_ticks))]
+                            else "%g" % beta_ticks[n] for n in range(0, len(beta_ticks))]
           pplot = points(plot_points, pointsize = 6, 
                          legend_label = "N = %d" % nval, 
                          legend_color = point_colors[nidx], 
@@ -221,25 +223,38 @@ def compute_2d_integral_plots(init_vectors = [V(1, golden_ratio), V(1, 0)]):
                          axes_labels = ["$\\beta$", "$\\alpha$"], 
                          gridlines = True, ticks = [beta_ticks, None], 
                          tick_formatter = [xtick_formatter, None], 
-                         title = "Looking for Hidden Signals: $\\int_0^1\\int_0^1\\sum_{1 \\leq k \\leq N} \\Re[e^{2\\pi\\imath\\alpha(mx+ny)}] dxdy = \\beta \\cdot N$")
+                         title = "Looking for Hidden Signals (%s): $\\int_0^1\\int_0^1\\sum_{1 \\leq k \\leq N} \\Re[e^{2\\pi\\imath\\alpha(mx+ny)}] dxdy = \\beta \\cdot N$" % plot_id)
           total_plot += pplot
-
+          total_plot.show()
      ##
      total_plot.show()
 ##
 
+def compute_fourier_transform(init_vectors): 
+     nvalues = [25, 50, 75, 100, 150]
+     point_colors = rainbow(len(nvalues))
+     total_plot = Graphics()
+     for (nidx, nval) in enumerate(nvalues): 
+          ulam_set = compute_ulam_set(nval, init_vectors)
+          alpha, x, y, omega = var('alpha x y omega')
+          ftfunc = lambda m, n: -1 / 4.0 / m / n * (abs(m-omega) + \
+                                abs(n - omega) - abs(m + n - omega) \
+                                - 2 * abs(omega) + abs(m + omega) + \
+                                abs(n + omega) - abs(m + n + omega))
+          ftsum = sum(map(lambda (m, n): ftfunc(m, n), ulam_set))
+          ftplot = plot(ftsum, (-50, 50), legend_label = "N = %d" % nval, 
+                        rgbcolor = point_colors[nidx], 
+                        title = "Fourier Transforms")
+          total_plot += ftplot
+          total_plot.show()
+     ## 
+##
 
-
-a1a2_array = [ [ [1,1], [1,2], [1,3], [1,4] ], 
-               [ [2,1], [2,2], [2,3], [2,4] ], 
-               [ [3,1], [3,2], [3,3], [3,4] ], 
-               [ [4,1], [4,2], [4,3], [4,4] ]
-             ]
 initial_vector_configs = [ ## examples from Jayadev's talk and in the article: 
-          #[V(1, float(golden_ratio)), V(0, 1)], 
-          #[V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
-          #[V(1, float(golden_ratio)), V(1, 0)], 
-          [V(1, 0), V(0, 1)], 
+          [V(1, float(golden_ratio)), V(0, 1)], 
+          [V(1, float(golden_ratio)), V(float(golden_ratio), 1)], 
+          [V(1, float(golden_ratio)), V(1, 0)], 
+          #[V(1, 0), V(0, 1)], 
           #[V(9, 0), V(0, 9), V(1, 13)], 
           #[V(2, 5), V(3, 1)], 
           #[V(1, 0), V(2, 0), V(0, 1)], 
